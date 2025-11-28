@@ -1917,11 +1917,6 @@ bool LadyVashjAssignDpsPriorityAction::Execute(Event event)
 
         switch (unit->GetEntry())
         {
-            case NPC_TAINTED_ELEMENTAL:
-                if (!tainted || bot->GetExactDist2d(unit) < bot->GetExactDist2d(tainted))
-                    tainted = unit;
-                break;
-
             case NPC_ENCHANTED_ELEMENTAL:
                 if (!enchanted || vashj->GetExactDist2d(unit) < vashj->GetExactDist2d(enchanted))
                     enchanted = unit;
@@ -1959,22 +1954,22 @@ bool LadyVashjAssignDpsPriorityAction::Execute(Event event)
             // Hunters and Mages prioritize Enchanted Elementals, while other ranged DPS prioritize Striders
             // This works well with 3 Hunters and 2 Mages; effectiveness may vary based on raid composition
             if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_MAGE)
-                targets = { tainted, enchanted, strider, elite };
+                targets = { enchanted, strider, elite };
             else
-                targets = { tainted, strider, elite, enchanted };
+                targets = { strider, elite, enchanted };
         }
         else if (botAI->IsMelee(bot) && botAI->IsDps(bot))
-            targets = { tainted, enchanted, elite };
+            targets = { enchanted, elite };
         else if (botAI->IsTank(bot))
         {
             // With raid cheats enabled, the first assist tank will tank the Strider
             if (botAI->HasCheat(BotCheatMask::raid) && botAI->IsAssistTankOfIndex(bot, 0))
-                targets = { strider, enchanted, tainted };
+                targets = { strider, enchanted };
             else
-                targets = { elite, enchanted, tainted };
+                targets = { elite, enchanted };
         }
         else
-            targets = { tainted, enchanted, elite, strider };
+            targets = { enchanted, elite, strider };
     }
 
     if (IsLadyVashjInPhase3(botAI))
