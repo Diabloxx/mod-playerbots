@@ -11,7 +11,6 @@ public:
     {
         creators["underbog colossus spawned toxic pool after death"] = &RaidSSCTriggerContext::underbog_colossus_spawned_toxic_pool_after_death;
         creators["greyheart tidecaller water elemental totem spawned"] = &RaidSSCTriggerContext::greyheart_tidecaller_water_elemental_totem_spawned;
-        creators["rancid mushroom spawned"] = &RaidSSCTriggerContext::rancid_mushroom_spawned;
 
         creators["hydross the unstable bot is frost tank"] = &RaidSSCTriggerContext::hydross_the_unstable_bot_is_frost_tank;
         creators["hydross the unstable bot is nature tank"] = &RaidSSCTriggerContext::hydross_the_unstable_bot_is_nature_tank;
@@ -24,22 +23,22 @@ public:
         creators["the lurker below spout is active"] = &RaidSSCTriggerContext::the_lurker_below_spout_is_active;
         creators["the lurker below boss is active for main tank"] = &RaidSSCTriggerContext::the_lurker_below_boss_is_active_for_main_tank;
         creators["the lurker below boss casts geyser"] = &RaidSSCTriggerContext::the_lurker_below_boss_casts_geyser;
+        creators["the lurker below boss is submerged"] = &RaidSSCTriggerContext::the_lurker_below_boss_is_submerged;
         creators["the lurker below need to prepare timer for spout"] = &RaidSSCTriggerContext::the_lurker_below_need_to_prepare_timer_for_spout;
 
         creators["leotheras the blind boss is inactive"] = &RaidSSCTriggerContext::leotheras_the_blind_boss_is_inactive;
-        creators["leotheras the blind engaged by demon form tank"] = &RaidSSCTriggerContext::leotheras_the_blind_engaged_by_demon_form_tank;
+        creators["leotheras the blind boss transformed into demon form"] = &RaidSSCTriggerContext::leotheras_the_blind_boss_transformed_into_demon_form;
         creators["leotheras the blind boss engaged by ranged"] = &RaidSSCTriggerContext::leotheras_the_blind_boss_engaged_by_ranged;
         creators["leotheras the blind boss channeling whirlwind"] = &RaidSSCTriggerContext::leotheras_the_blind_boss_channeling_whirlwind;
-        creators["leotheras the blind demon form engaged by melee without warlock tank"] = &RaidSSCTriggerContext::leotheras_the_blind_demon_form_engaged_by_melee_without_warlock_tank;
         creators["leotheras the blind inner demon cheat"] = &RaidSSCTriggerContext::leotheras_the_blind_inner_demon_cheat;
         creators["leotheras the blind entered final phase"] = &RaidSSCTriggerContext::leotheras_the_blind_entered_final_phase;
         creators["leotheras the blind demon form tank needs aggro"] = &RaidSSCTriggerContext::leotheras_the_blind_demon_form_tank_needs_aggro;
         creators["leotheras the blind need to manage timers and trackers"] = &RaidSSCTriggerContext::leotheras_the_blind_need_to_manage_timers_and_trackers;
 
         creators["fathom-lord karathress boss engaged by main tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_boss_engaged_by_main_tank;
-        creators["fathom-lord karathress sharkkis engaged by first assist tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_sharkkis_engaged_by_first_assist_tank;
-        creators["fathom-lord karathress tidalvess engaged by second assist tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_tidalvess_engaged_by_second_assist_tank;
-        creators["fathom-lord karathress caribdis engaged by third assist tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_caribdis_engaged_by_third_assist_tank;
+        creators["fathom-lord karathress caribdis engaged by first assist tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_caribdis_engaged_by_first_assist_tank;
+        creators["fathom-lord karathress sharkkis engaged by second assist tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_sharkkis_engaged_by_second_assist_tank;
+        creators["fathom-lord karathress tidalvess engaged by third assist tank"] = &RaidSSCTriggerContext::fathom_lord_karathress_tidalvess_engaged_by_third_assist_tank;
         creators["fathom-lord karathress caribdis tank needs dedicated healer"] = &RaidSSCTriggerContext::fathom_lord_karathress_caribdis_tank_needs_dedicated_healer;
         creators["fathom-lord karathress pulling bosses"] = &RaidSSCTriggerContext::fathom_lord_karathress_pulling_bosses;
         creators["fathom-lord karathress determining kill order"] = &RaidSSCTriggerContext::fathom_lord_karathress_determining_kill_order;
@@ -59,7 +58,7 @@ public:
         creators["lady vashj determining kill order of adds"] = &RaidSSCTriggerContext::lady_vashj_determining_kill_order_of_adds;
         creators["lady vashj tainted elemental cheat"] = &RaidSSCTriggerContext::lady_vashj_tainted_elemental_cheat;
         creators["lady vashj tainted core was looted"] = &RaidSSCTriggerContext::lady_vashj_tainted_core_was_looted;
-        creators["lady vashj core handler is dead"] = &RaidSSCTriggerContext::lady_vashj_core_handler_is_dead;
+        creators["lady vashj tainted core is unusable"] = &RaidSSCTriggerContext::lady_vashj_tainted_core_is_unusable;
         creators["lady vashj toxic sporebats are spewing poison clouds"] = &RaidSSCTriggerContext::lady_vashj_toxic_sporebats_are_spewing_poison_clouds;
         creators["lady vashj bot is entangled in toxic spores or static charge"] = &RaidSSCTriggerContext::lady_vashj_bot_is_entangled_in_toxic_spores_or_static_charge;
         creators["lady vashj need to manage trackers"] = &RaidSSCTriggerContext::lady_vashj_need_to_manage_trackers;
@@ -68,7 +67,6 @@ public:
 private:
     static Trigger* underbog_colossus_spawned_toxic_pool_after_death(PlayerbotAI* botAI) { return new UnderbogColossusSpawnedToxicPoolAfterDeathTrigger(botAI); }
     static Trigger* greyheart_tidecaller_water_elemental_totem_spawned(PlayerbotAI* botAI) { return new GreyheartTidecallerWaterElementalTotemSpawnedTrigger(botAI); }
-    static Trigger* rancid_mushroom_spawned(PlayerbotAI* botAI) { return new RancidMushroomSpawnedTrigger(botAI); }
 
     static Trigger* hydross_the_unstable_bot_is_frost_tank(PlayerbotAI* botAI) { return new HydrossTheUnstableBotIsFrostTankTrigger(botAI); }
     static Trigger* hydross_the_unstable_bot_is_nature_tank(PlayerbotAI* botAI) { return new HydrossTheUnstableBotIsNatureTankTrigger(botAI); }
@@ -81,22 +79,22 @@ private:
     static Trigger* the_lurker_below_spout_is_active(PlayerbotAI* botAI) { return new TheLurkerBelowSpoutIsActiveTrigger(botAI); }
     static Trigger* the_lurker_below_boss_is_active_for_main_tank(PlayerbotAI* botAI) { return new TheLurkerBelowBossIsActiveForMainTankTrigger(botAI); }
     static Trigger* the_lurker_below_boss_casts_geyser(PlayerbotAI* botAI) { return new TheLurkerBelowBossCastsGeyserTrigger(botAI); }
+    static Trigger* the_lurker_below_boss_is_submerged(PlayerbotAI* botAI) { return new TheLurkerBelowBossIsSubmergedTrigger(botAI); }
     static Trigger* the_lurker_below_need_to_prepare_timer_for_spout(PlayerbotAI* botAI) { return new TheLurkerBelowNeedToPrepareTimerForSpoutTrigger(botAI); }
 
     static Trigger* leotheras_the_blind_boss_is_inactive(PlayerbotAI* botAI) { return new LeotherasTheBlindBossIsInactiveTrigger(botAI); }
-    static Trigger* leotheras_the_blind_engaged_by_demon_form_tank(PlayerbotAI* botAI) { return new LeotherasTheBlindEngagedByDemonFormTankTrigger(botAI); }
+    static Trigger* leotheras_the_blind_boss_transformed_into_demon_form(PlayerbotAI* botAI) { return new LeotherasTheBlindBossTransformedIntoDemonFormTrigger(botAI); }
     static Trigger* leotheras_the_blind_boss_engaged_by_ranged(PlayerbotAI* botAI) { return new LeotherasTheBlindBossEngagedByRangedTrigger(botAI); }
     static Trigger* leotheras_the_blind_boss_channeling_whirlwind(PlayerbotAI* botAI) { return new LeotherasTheBlindBossChannelingWhirlwindTrigger(botAI); }
-    static Trigger* leotheras_the_blind_demon_form_engaged_by_melee_without_warlock_tank(PlayerbotAI* botAI) { return new LeotherasTheBlindDemonFormEngagedByMeleeWithoutWarlockTankTrigger(botAI); }
     static Trigger* leotheras_the_blind_inner_demon_cheat(PlayerbotAI* botAI) { return new LeotherasTheBlindInnerDemonCheatTrigger(botAI); }
     static Trigger* leotheras_the_blind_entered_final_phase(PlayerbotAI* botAI) { return new LeotherasTheBlindEnteredFinalPhaseTrigger(botAI); }
     static Trigger* leotheras_the_blind_demon_form_tank_needs_aggro(PlayerbotAI* botAI) { return new LeotherasTheBlindDemonFormTankNeedsAggro(botAI); }
     static Trigger* leotheras_the_blind_need_to_manage_timers_and_trackers(PlayerbotAI* botAI) { return new LeotherasTheBlindNeedToManageTimersAndTrackersTrigger(botAI); }
 
     static Trigger* fathom_lord_karathress_boss_engaged_by_main_tank(PlayerbotAI* botAI) { return new FathomLordKarathressBossEngagedByMainTankTrigger(botAI); }
-    static Trigger* fathom_lord_karathress_sharkkis_engaged_by_first_assist_tank(PlayerbotAI* botAI) { return new FathomLordKarathressSharkkisEngagedByFirstAssistTankTrigger(botAI); }
-    static Trigger* fathom_lord_karathress_tidalvess_engaged_by_second_assist_tank(PlayerbotAI* botAI) { return new FathomLordKarathressTidalvessEngagedBySecondAssistTankTrigger(botAI); }
-    static Trigger* fathom_lord_karathress_caribdis_engaged_by_third_assist_tank(PlayerbotAI* botAI) { return new FathomLordKarathressCaribdisEngagedByThirdAssistTankTrigger(botAI); }
+    static Trigger* fathom_lord_karathress_caribdis_engaged_by_first_assist_tank(PlayerbotAI* botAI) { return new FathomLordKarathressCaribdisEngagedByFirstAssistTankTrigger(botAI); }
+    static Trigger* fathom_lord_karathress_sharkkis_engaged_by_second_assist_tank(PlayerbotAI* botAI) { return new FathomLordKarathressSharkkisEngagedBySecondAssistTankTrigger(botAI); }
+    static Trigger* fathom_lord_karathress_tidalvess_engaged_by_third_assist_tank(PlayerbotAI* botAI) { return new FathomLordKarathressTidalvessEngagedByThirdAssistTankTrigger(botAI); }
     static Trigger* fathom_lord_karathress_caribdis_tank_needs_dedicated_healer(PlayerbotAI* botAI) { return new FathomLordKarathressCaribdisTankNeedsDedicatedHealerTrigger(botAI); }
     static Trigger* fathom_lord_karathress_pulling_bosses(PlayerbotAI* botAI) { return new FathomLordKarathressPullingBossesTrigger(botAI); }
     static Trigger* fathom_lord_karathress_determining_kill_order(PlayerbotAI* botAI) { return new FathomLordKarathressDeterminingKillOrderTrigger(botAI); }
@@ -116,7 +114,7 @@ private:
     static Trigger* lady_vashj_determining_kill_order_of_adds(PlayerbotAI* botAI) { return new LadyVashjDeterminingKillOrderOfAddsTrigger(botAI); }
     static Trigger* lady_vashj_tainted_elemental_cheat(PlayerbotAI* botAI) { return new LadyVashjTaintedElementalCheatTrigger(botAI); }
     static Trigger* lady_vashj_tainted_core_was_looted(PlayerbotAI* botAI) { return new LadyVashjTaintedCoreWasLootedTrigger(botAI); }
-    static Trigger* lady_vashj_core_handler_is_dead(PlayerbotAI* botAI) { return new LadyVashjCoreHandlerIsDeadTrigger(botAI); }
+    static Trigger* lady_vashj_tainted_core_is_unusable(PlayerbotAI* botAI) { return new LadyVashjTaintedCoreIsUnusableTrigger(botAI); }
     static Trigger* lady_vashj_toxic_sporebats_are_spewing_poison_clouds(PlayerbotAI* botAI) { return new LadyVashjToxicSporebatsAreSpewingPoisonCloudsTrigger(botAI); }
     static Trigger* lady_vashj_bot_is_entangled_in_toxic_spores_or_static_charge(PlayerbotAI* botAI) { return new LadyVashjBotIsEntangledInToxicSporesOrStaticChargeTrigger(botAI); }
     static Trigger* lady_vashj_need_to_manage_trackers(PlayerbotAI* botAI) { return new LadyVashjNeedToManageTrackersTrigger(botAI); }

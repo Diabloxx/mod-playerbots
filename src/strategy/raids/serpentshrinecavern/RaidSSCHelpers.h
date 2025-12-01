@@ -12,7 +12,7 @@ namespace SerpentShrineCavernHelpers
 {
     enum SerpentShrineCavernSpells
     {
-        // Trash Mob
+        // Trash Mobs
         SPELL_TOXIC_POOL             = 38718,
 
         // Hydross the Unstable <Duke of Currents>
@@ -42,10 +42,12 @@ namespace SerpentShrineCavernHelpers
 
         // Lady Vashj <Coilfang Matron>
         SPELL_FEAR_WARD              = 6346,
-        SPELL_PARALYZE               = 38132,
         SPELL_POISON_BOLT            = 38253,
         SPELL_STATIC_CHARGE          = 38280,
         SPELL_ENTANGLE               = 38316,
+
+        // Druid
+        SPELL_TREE_OF_LIFE           = 33891,
 
         // Hunter
         SPELL_MISDIRECTION           = 35079,
@@ -68,11 +70,13 @@ namespace SerpentShrineCavernHelpers
     {
         // Trash Mobs
         NPC_WATER_ELEMENTAL_TOTEM    = 22236,
-        NPC_RANCID_MUSHROOM          = 22250,
 
         // Hydross the Unstable <Duke of Currents>
         NPC_PURE_SPAWN_OF_HYDROSS    = 22035,
         NPC_TAINTED_SPAWN_OF_HYDROSS = 22036,
+
+        // The Lurker Below
+        NPC_COILFANG_GUARDIAN        = 21873,
 
         // Leotheras the Blind
         NPC_LEOTHERAS_THE_BLIND      = 21215,
@@ -103,6 +107,8 @@ namespace SerpentShrineCavernHelpers
         ITEM_HEAVY_NETHERWEAVE_NET   = 24269,
     };
 
+    constexpr uint32 SSC_MAP_ID = 548;
+
     extern std::unordered_map<uint32, time_t> hydrossFrostDpsWaitTimer;
     extern std::unordered_map<uint32, time_t> hydrossNatureDpsWaitTimer;
     extern std::unordered_map<uint32, time_t> hydrossChangeToFrostPhaseTimer;
@@ -121,10 +127,10 @@ namespace SerpentShrineCavernHelpers
     extern std::unordered_map<ObjectGuid, uint8> tidewalkerRangedStep;
 
     extern std::unordered_map<ObjectGuid, Position> vashjRangedPositions;
-    extern std::unordered_map<ObjectGuid, bool> vashjHasReachedRangedPosition;
+    extern std::unordered_map<ObjectGuid, bool> hasReachedVashjRangedPosition;
     extern std::unordered_map<ObjectGuid, Position> intendedLineup;
-    extern std::unordered_map<ObjectGuid, time_t> lastImbueAttempt;
-    extern std::unordered_map<uint32, time_t> lastParalyzeTime;
+    extern std::unordered_map<uint32, time_t> lastImbueAttempt;
+    extern std::unordered_map<uint32, time_t> lastCoreInInventoryTime;
 
     namespace SerpentShrineCavernPositions
     {
@@ -178,9 +184,9 @@ namespace SerpentShrineCavernHelpers
     bool IsLadyVashjInPhase1(PlayerbotAI* botAI);
     bool IsLadyVashjInPhase2(PlayerbotAI* botAI);
     bool IsLadyVashjInPhase3(PlayerbotAI* botAI);
-    bool IsValidPhase2CombatNpc(Unit* unit, PlayerbotAI* botAI);
-    bool AnyRecentParalyze(Group* group, uint32 mapId, uint32 graceSeconds = 3);
-    Player* GetDesignatedCoreLooter(Group* group, Player* master, PlayerbotAI* botAI);
+    bool IsValidLadyVashjCombatNpc(Unit* unit, PlayerbotAI* botAI);
+    bool AnyRecentCoreInInventory(Group* group, uint32 graceSeconds = 3);
+    Player* GetDesignatedCoreLooter(Group* group, PlayerbotAI* botAI);
     Player* GetFirstTaintedCorePasser(Group* group, PlayerbotAI* botAI);
     Player* GetSecondTaintedCorePasser(Group* group, PlayerbotAI* botAI);
     Player* GetThirdTaintedCorePasser(Group* group, PlayerbotAI* botAI);
