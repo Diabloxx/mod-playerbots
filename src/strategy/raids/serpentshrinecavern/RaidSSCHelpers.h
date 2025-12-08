@@ -38,6 +38,7 @@ namespace SerpentShrineCavernHelpers
         SPELL_WHIRLWIND              = 37640,
         SPELL_WHIRLWIND_CHANNEL      = 37641,
         SPELL_METAMORPHOSIS          = 37673,
+        SPELL_CHAOS_BLAST            = 37675,
         SPELL_INSIDIOUS_WHISPER      = 37676,
 
         // Lady Vashj <Coilfang Matron>
@@ -107,7 +108,7 @@ namespace SerpentShrineCavernHelpers
         ITEM_HEAVY_NETHERWEAVE_NET   = 24269,
     };
 
-    constexpr uint32 SSC_MAP_ID = 548;
+    const uint32 SSC_MAP_ID = 548;
 
     extern std::unordered_map<uint32, time_t> hydrossFrostDpsWaitTimer;
     extern std::unordered_map<uint32, time_t> hydrossNatureDpsWaitTimer;
@@ -128,31 +129,29 @@ namespace SerpentShrineCavernHelpers
 
     extern std::unordered_map<ObjectGuid, Position> vashjRangedPositions;
     extern std::unordered_map<ObjectGuid, bool> hasReachedVashjRangedPosition;
+    extern std::unordered_map<uint32, ObjectGuid> nearestTriggerGuid;
     extern std::unordered_map<ObjectGuid, Position> intendedLineup;
     extern std::unordered_map<uint32, time_t> lastImbueAttempt;
     extern std::unordered_map<uint32, time_t> lastCoreInInventoryTime;
 
-    namespace SerpentShrineCavernPositions
-    {
-        extern const Position HydrossFrostTankPosition;
-        extern const Position HydrossNatureTankPosition;
+    extern const Position HYDROSS_FROST_TANK_POSITION;
+    extern const Position HYDROSS_NATURE_TANK_POSITION;
 
-        extern const Position LurkerMainTankPosition;
+    extern const Position LURKER_MAIN_TANK_POSITION;
 
-        extern const Position KarathressTankPosition;
-        extern const Position TidalvessTankPosition;
-        extern const Position SharkkisTankPosition;
-        extern const Position CaribdisTankPosition;
-        extern const Position CaribdisHealerPosition;
-        extern const Position CaribdisRangedDpsPosition;
+    extern const Position KARATHRESS_TANK_POSITION;
+    extern const Position TIDALVESS_TANK_POSITION;
+    extern const Position SHARKKIS_TANK_POSITION;
+    extern const Position CARIBDIS_TANK_POSITION;
+    extern const Position CARIBDIS_HEALER_POSITION;
+    extern const Position CARIBDIS_RANGED_DPS_POSITION;
 
-        extern const Position TidewalkerPhase1TankPosition;
-        extern const Position TidewalkerPhaseTransitionWaypoint;
-        extern const Position TidewalkerPhase2TankPosition;
-        extern const Position TidewalkerPhase2RangedPosition;
+    extern const Position TIDEWALKER_PHASE_1_TANK_POSITION;
+    extern const Position TIDEWALKER_PHASE_TRANSITION_WAYPOINT;
+    extern const Position TIDEWALKER_PHASE_2_TANK_POSITION;
+    extern const Position TIDEWALKER_PHASE_2_RANGED_POSITION;
 
-        extern const Position VashjPlatformCenterPosition;
-    }
+    extern const Position VASHJ_PLATFORM_CENTER_POSITION;
 
     void MarkTargetWithIcon(Player* bot, Unit* target, uint8 iconId);
     void MarkTargetWithSkull(Player* bot, Unit* target);
@@ -200,7 +199,7 @@ namespace SerpentShrineCavernHelpers
 
     extern const std::vector<uint32> SHIELD_GENERATOR_DB_GUIDS;
     std::vector<GeneratorInfo> GetAllGeneratorInfosByDbGuids(Map* map, const std::vector<uint32>& generatorDbGuids);
-    Unit* GetNearestActiveShieldGeneratorTriggerByEntry(Player* bot, Unit* reference);
+    Unit* GetNearestActiveShieldGeneratorTriggerByEntry(Unit* reference);
     const GeneratorInfo* GetNearestGeneratorToBot(Player* bot, const std::vector<GeneratorInfo>& generators);
 }
 

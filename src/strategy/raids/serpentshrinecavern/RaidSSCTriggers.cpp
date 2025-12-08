@@ -82,7 +82,7 @@ bool HydrossTheUnstableAggroResetsUponPhaseChangeTrigger::IsActive()
     if (bot->getClass() == CLASS_HUNTER)
         return false;
 
-    if (!botAI->IsDps(bot))
+    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
         return false;
 
     Unit* hydross = AI_VALUE2(Unit*, "find target", "hydross the unstable");
@@ -220,7 +220,8 @@ bool LeotherasTheBlindBossEngagedByRangedTrigger::IsActive()
         return false;
 
     Unit* leotheras = AI_VALUE2(Unit*, "find target", "leotheras the blind");
-    return leotheras && !leotheras->HasAura(SPELL_LEOTHERAS_BANISHED);
+    return leotheras && !leotheras->HasAura(SPELL_LEOTHERAS_BANISHED) &&
+           !leotheras->HasAura(SPELL_WHIRLWIND) && !leotheras->HasAura(SPELL_WHIRLWIND_CHANNEL);
 }
 
 bool LeotherasTheBlindBossChannelingWhirlwindTrigger::IsActive()
@@ -231,6 +232,23 @@ bool LeotherasTheBlindBossChannelingWhirlwindTrigger::IsActive()
     Unit* leotheras = AI_VALUE2(Unit*, "find target", "leotheras the blind");
     return leotheras && !leotheras->HasAura(SPELL_LEOTHERAS_BANISHED) &&
            (leotheras->HasAura(SPELL_WHIRLWIND) || leotheras->HasAura(SPELL_WHIRLWIND_CHANNEL));
+}
+
+bool LeotherasTheBlindBotHasTooManyChaosBlastStacksTrigger::IsActive()
+{
+    Player* demonFormTank = GetLeotherasDemonFormTank(botAI, bot);
+    if (!demonFormTank)
+        return false;
+
+    if (!botAI->IsMelee(bot) && !botAI->IsDps(bot))
+        return false;
+
+    Unit* leotherasPhase2Demon = GetPhase2LeotherasDemon(botAI);
+    if (!leotherasPhase2Demon)
+        return false;
+
+    Aura* chaosBlast = bot->GetAura(SPELL_CHAOS_BLAST);
+    return chaosBlast && chaosBlast->GetStackAmount() >= 5;
 }
 
 bool LeotherasTheBlindInnerDemonCheatTrigger::IsActive()
@@ -270,7 +288,7 @@ bool LeotherasTheBlindDemonFormTankNeedsAggro::IsActive()
     return leotheras != nullptr;
 }
 
-bool LeotherasTheBlindNeedToManageTimersAndTrackersTrigger::IsActive()
+bool LeotherasTheBlindBossWipesAggroUponPhaseChangeTrigger::IsActive()
 {
     if (!IsMapIDTimerManager(botAI, bot))
         return false;
@@ -326,21 +344,20 @@ bool FathomLordKarathressCaribdisTankNeedsDedicatedHealerTrigger::IsActive()
     if (!caribdis || !caribdis->IsAlive())
         return false;
 
-    Group* group = bot->GetGroup();
-    if (!group)
-        return false;
-
     Player* firstAssistTank = nullptr;
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    if (Group* group = bot->GetGroup())
     {
-        Player* member = ref->GetSource();
-        if (!member || !member->IsAlive())
-            continue;
-
-        if (botAI->IsAssistTankOfIndex(member, 0))
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
-            firstAssistTank = member;
-            break;
+            Player* member = ref->GetSource();
+            if (!member || !member->IsAlive())
+                continue;
+
+            if (botAI->IsAssistTankOfIndex(member, 0))
+            {
+                firstAssistTank = member;
+                break;
+            }
         }
     }
 
@@ -561,8 +578,7 @@ bool LadyVashjTaintedCoreWasLootedTrigger::IsActive()
 
     if (bot == designatedLooter)
     {
-        if (hasCore(firstCorePasser) || hasCore(secondCorePasser) ||
-            hasCore(thirdCorePasser) || hasCore(fourthCorePasser))
+        if (!hasCore(bot))
             return false;
     }
     else if (bot == firstCorePasser)

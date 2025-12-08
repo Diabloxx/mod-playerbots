@@ -26,31 +26,29 @@ namespace SerpentShrineCavernHelpers
 
     std::unordered_map<ObjectGuid, Position> vashjRangedPositions;
     std::unordered_map<ObjectGuid, bool> hasReachedVashjRangedPosition;
+    std::unordered_map<uint32, ObjectGuid> nearestTriggerGuid;
     std::unordered_map<ObjectGuid, Position> intendedLineup;
     std::unordered_map<uint32, time_t> lastImbueAttempt;
     std::unordered_map<uint32, time_t> lastCoreInInventoryTime;
 
-    namespace SerpentShrineCavernPositions
-    {
-        const Position HydrossFrostTankPosition = { -236.669f, -358.352f, -0.828f };
-        const Position HydrossNatureTankPosition = { -225.471f, -327.790f, -3.682f };
+    const Position HYDROSS_FROST_TANK_POSITION = { -236.669f, -358.352f, -0.828f };
+    const Position HYDROSS_NATURE_TANK_POSITION = { -225.471f, -327.790f, -3.682f };
 
-        const Position LurkerMainTankPosition = { 23.706f, -406.038f, -19.686f };
+    const Position LURKER_MAIN_TANK_POSITION = { 23.706f, -406.038f, -19.686f };
 
-        const Position KarathressTankPosition = { 474.403f, -531.118f, -7.548f };
-        const Position TidalvessTankPosition = { 511.282f, -501.162f, -13.158f };
-        const Position SharkkisTankPosition = { 508.057f, -541.109f, -10.133f };
-        const Position CaribdisTankPosition = { 464.462f, -475.820f, -13.158f };
-        const Position CaribdisHealerPosition = { 466.203f, -503.201f, -13.158f };
-        const Position CaribdisRangedDpsPosition = { 463.197f, -501.190f, -13.158f };
+    const Position KARATHRESS_TANK_POSITION = { 474.403f, -531.118f, -7.548f };
+    const Position TIDALVESS_TANK_POSITION = { 511.282f, -501.162f, -13.158f };
+    const Position SHARKKIS_TANK_POSITION = { 508.057f, -541.109f, -10.133f };
+    const Position CARIBDIS_TANK_POSITION = { 464.462f, -475.820f, -13.158f };
+    const Position CARIBDIS_HEALER_POSITION = { 466.203f, -503.201f, -13.158f };
+    const Position CARIBDIS_RANGED_DPS_POSITION = { 463.197f, -501.190f, -13.158f };
 
-        const Position TidewalkerPhase1TankPosition = { 410.925f, -741.916f, -7.146f };
-        const Position TidewalkerPhaseTransitionWaypoint = { 407.035f, -759.479f, -7.168f };
-        const Position TidewalkerPhase2TankPosition = { 446.571f, -767.155f, -7.144f };
-        const Position TidewalkerPhase2RangedPosition = { 432.595f, -766.288f, -7.145f };
+    const Position TIDEWALKER_PHASE_1_TANK_POSITION = { 410.925f, -741.916f, -7.146f };
+    const Position TIDEWALKER_PHASE_TRANSITION_WAYPOINT = { 407.035f, -759.479f, -7.168f };
+    const Position TIDEWALKER_PHASE_2_TANK_POSITION = { 446.571f, -767.155f, -7.144f };
+    const Position TIDEWALKER_PHASE_2_RANGED_POSITION = { 432.595f, -766.288f, -7.145f };
 
-        const Position VashjPlatformCenterPosition = { 29.634f, -923.541f, 42.985f };
-    }
+    const Position VASHJ_PLATFORM_CENTER_POSITION = { 29.634f, -923.541f, 42.985f };
 
     void MarkTargetWithIcon(Player* bot, Unit* target, uint8 iconId)
     {
@@ -246,20 +244,19 @@ namespace SerpentShrineCavernHelpers
 
     Player* GetLeotherasDemonFormTank(PlayerbotAI* botAI, Player* bot)
     {
-        Group* group = bot->GetGroup();
-        if (!group)
-            return nullptr;
-
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        if (Group* group = bot->GetGroup())
         {
-            Player* member = ref->GetSource();
-            if (!member || !member->IsAlive())
-                continue;
+            for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+            {
+                Player* member = ref->GetSource();
+                if (!member || !member->IsAlive())
+                    continue;
 
-            PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
-            if (member->getClass() == CLASS_WARLOCK &&
-                memberAI && memberAI->HasStrategy("tank", BotState::BOT_STATE_COMBAT))
-                return member;
+                PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
+                if (member->getClass() == CLASS_WARLOCK &&
+                    memberAI && memberAI->HasStrategy("tank", BotState::BOT_STATE_COMBAT))
+                    return member;
+            }
         }
 
         return nullptr;
@@ -348,23 +345,17 @@ namespace SerpentShrineCavernHelpers
 
     bool AnyRecentCoreInInventory(Group* group, uint32 graceSeconds)
     {
-        if (!group)
-            return false;
-
-        const time_t now = std::time(nullptr);
-
-        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        if (group)
         {
-            Player* member = ref->GetSource();
-            if (!member)
-                continue;
-
-            if (member->IsAlive() && member->HasItemCount(ITEM_TAINTED_CORE, 1, false))
+            for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
             {
-                lastCoreInInventoryTime[SSC_MAP_ID] = now;
-                return true;
+                Player* member = ref->GetSource();
+                if (member && member->HasItemCount(ITEM_TAINTED_CORE, 1, false))
+                    return true;
             }
         }
+
+        const time_t now = std::time(nullptr);
 
         auto it = lastCoreInInventoryTime.find(SSC_MAP_ID);
         if (it != lastCoreInInventoryTime.end())
@@ -587,13 +578,9 @@ namespace SerpentShrineCavernHelpers
 
     // Returns the nearest active Shield Generator to the bot
     // Active generators are powered by NPC_WORLD_INVISIBLE_TRIGGER creatures, which depawn after use
-    Unit* GetNearestActiveShieldGeneratorTriggerByEntry(Player* bot, Unit* reference)
+    Unit* GetNearestActiveShieldGeneratorTriggerByEntry(Unit* reference)
     {
-        if (!bot || !reference)
-            return nullptr;
-
-        Map* map = bot->GetMap();
-        if (!map)
+        if (!reference)
             return nullptr;
 
         std::list<Creature*> triggers;
