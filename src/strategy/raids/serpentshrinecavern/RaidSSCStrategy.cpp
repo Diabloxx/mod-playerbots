@@ -42,7 +42,7 @@ void RaidSSCStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("the lurker below position main tank", ACTION_RAID + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("the lurker below boss casts geyser",
-        NextAction::array(0, new NextAction("the lurker below spread ranged", ACTION_RAID + 1), nullptr)
+        NextAction::array(0, new NextAction("the lurker below spread ranged in arc", ACTION_RAID + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("the lurker below boss is submerged",
         NextAction::array(0, new NextAction("the lurker below tanks pick up adds", ACTION_EMERGENCY + 1), nullptr)
@@ -125,7 +125,7 @@ void RaidSSCStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("lady vashj main tank position boss", ACTION_RAID + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("lady vashj boss engaged by ranged in phase 1",
-        NextAction::array(0, new NextAction("lady vashj phase 1 position ranged", ACTION_RAID + 1), nullptr)
+        NextAction::array(0, new NextAction("lady vashj phase 1 spread ranged in arc", ACTION_RAID + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("lady vashj casts shock blast on highest aggro",
         NextAction::array(0, new NextAction("lady vashj set grounding totem in main tank group", ACTION_EMERGENCY + 1), nullptr)
@@ -179,12 +179,13 @@ void RaidSSCStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new LeotherasTheBlindMeleeDpsAvoidChaosBlastMultiplier(botAI));
     multipliers.push_back(new LeotherasTheBlindWaitForDpsMultiplier(botAI));
     multipliers.push_back(new LeotherasTheBlindDelayBloodlustAndHeroismMultiplier(botAI));
-    multipliers.push_back(new FathomLordKarathressDisableTankAssistMultiplier(botAI));
+    multipliers.push_back(new FathomLordKarathressDisableTankActionsMultiplier(botAI));
     multipliers.push_back(new FathomLordKarathressDisableAoeMultiplier(botAI));
     multipliers.push_back(new FathomLordKarathressControlMisdirectionMultiplier(botAI));
     multipliers.push_back(new FathomLordKarathressWaitForDpsMultiplier(botAI));
     multipliers.push_back(new FathomLordKarathressCaribdisTankHealerMaintainPositionMultiplier(botAI));
     multipliers.push_back(new MorogrimTidewalkerDelayBloodlustAndHeroismMultiplier(botAI));
+    multipliers.push_back(new MorogrimTidewalkerDisableTankActionsMultiplier(botAI));
     multipliers.push_back(new MorogrimTidewalkerDisablePhase2MovementActionsMultiplier(botAI));
     multipliers.push_back(new LadyVashjDelayBloodlustAndHeroismMultiplier(botAI));
     multipliers.push_back(new LadyVashjStaticChargeStayAwayFromGroupMultiplier(botAI));
