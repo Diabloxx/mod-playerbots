@@ -1473,6 +1473,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 544:
             strategyName = "magtheridon";  // Magtheridon's Lair
             break;
+        case 550:
+            strategyName = "tempestkeep";  // Tempest Keep
+            break;
         case 565:
             strategyName = "gruulslair";  // Gruul's Lair
             break;
