@@ -1352,7 +1352,7 @@ bool KaelthasSunstriderSpreadAndMoveAwayFromCapernianAction::StayBackFromCaperni
         return true;
     }
 
-    float safeDistance;
+    float safeDistance = 0.0f;
     if (botAI->IsMelee(bot))
         safeDistance = 45.0f;
     else if (botAI->IsRangedDps(bot))
