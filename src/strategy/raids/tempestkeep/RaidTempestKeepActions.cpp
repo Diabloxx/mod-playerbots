@@ -402,6 +402,7 @@ bool AlarRangedDpsPrioritizeEmbersAction::Execute(Event event)
             return MoveAway(firstEmber, safeDistance - bot->GetDistance2d(firstEmber));
         }
         SetRtiTarget(botAI, "square", firstEmber);
+
         if (bot->GetTarget() != firstEmber->GetGUID())
             return Attack(firstEmber);
     }
@@ -414,12 +415,14 @@ bool AlarRangedDpsPrioritizeEmbersAction::Execute(Event event)
             return MoveAway(secondEmber, safeDistance - bot->GetDistance2d(secondEmber));
         }
         SetRtiTarget(botAI, "circle", secondEmber);
+
         if (bot->GetTarget() != secondEmber->GetGUID())
             return Attack(secondEmber);
     }
     else if (Unit* alar = AI_VALUE2(Unit*, "find target", "al'ar"))
     {
         SetRtiTarget(botAI, "star", alar);
+
         if (bot->GetTarget() != alar->GetGUID())
             return Attack(alar);
     }
@@ -509,8 +512,7 @@ bool AlarMoveAwayFromRebirthAction::Execute(Event event)
     const float safeDistance = 20.0f;
     if (currentDistance < safeDistance)
     {
-        bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        botAI->Reset();
         return MoveAway(alar, safeDistance - currentDistance);
     }
 
@@ -540,7 +542,11 @@ bool AlarSwapTanksOnBossAction::Execute(Event event)
     {
         SetRtiTarget(botAI, "star", alar);
 
-        if (alar->GetVictim() != bot)
+        if (bot->GetTarget() != alar->GetGUID())
+        {
+            return Attack(alar);
+        }
+        else if (alar->GetVictim() != bot)
         {
             const char* taunts[] = { "taunt", "growl", "hand of reckoning", "dark command" };
             for (const char* spellName : taunts)
@@ -549,8 +555,6 @@ bool AlarSwapTanksOnBossAction::Execute(Event event)
                     return botAI->CastSpell(spellName, alar);
             }
         }
-        else if (bot->GetTarget() != alar->GetGUID())
-                return Attack(alar);
     }
 
     return false;
@@ -955,6 +959,9 @@ Unit* HighAstromancerSolarianTargetSolariumPriestsAction::AssignSolariumPriestsT
 
 bool HighAstromancerSolarianTankVoidwalkerAction::Execute(Event event)
 {
+    if (!botAI->IsMainTank(bot))
+        return false;
+
     Unit* astromancer = AI_VALUE2(Unit*, "find target", "high astromancer solarian");
     if (!astromancer)
         return false;
@@ -977,6 +984,9 @@ bool HighAstromancerSolarianTankVoidwalkerAction::Execute(Event event)
 
 bool HighAstromancerSolarianCastFearWardOnMainTankAction::Execute(Event event)
 {
+    if (bot->getClass() != CLASS_PRIEST)
+        return false;
+
     Player* mainTank = nullptr;
     if (Group* group = bot->GetGroup())
     {
@@ -1175,7 +1185,7 @@ bool KaelthasSunstriderManageWarlockTankStrategyAction::Execute(Event event)
     if (kaelAI->GetPhase() == PHASE_WEAPONS)
     {
         if (currentlyTank)
-            botAI->ResetStrategies(false);
+            botAI->ChangeStrategy("-tank", BotState::BOT_STATE_COMBAT);
         return false;
     }
 
@@ -1198,7 +1208,7 @@ bool KaelthasSunstriderManageWarlockTankStrategyAction::Execute(Event event)
             botAI->ChangeStrategy("+tank", BotState::BOT_STATE_COMBAT);
         // If Capernian is dead, reset to DPS for remainder of encounter
         else if (!capernian && currentlyTank)
-            botAI->ResetStrategies(false);
+            botAI->ChangeStrategy("-tank", BotState::BOT_STATE_COMBAT);
     }
 
     return false;
@@ -1215,7 +1225,8 @@ bool KaelthasSunstriderWarlockTankPositionCapernianAction::Execute(Event event)
         return false;
 
     Unit* capernian = AI_VALUE2(Unit*, "find target", "grand astromancer capernian");
-    if (!capernian)
+    if (!capernian || capernian->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) ||
+        capernian->HasAura(SPELL_PERMANENT_FEIGN_DEATH))
         return false;
 
     MarkTargetWithCircle(bot, capernian);
@@ -1328,16 +1339,13 @@ bool KaelthasSunstriderSpreadAndMoveAwayFromCapernianAction::StayBackFromCaperni
     float currentDistance = bot->GetExactDist2d(capernian);
     if (currentDistance < safeDistance)
     {
-        bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        botAI->Reset();
         return MoveAway(capernian, safeDistance - currentDistance + 1.0f);
     }
 
     if (botAI->IsMelee(bot))
     {
-        bot->SetTarget(ObjectGuid::Empty);
-        bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        botAI->Reset();
         return true;
     }
 
@@ -2005,8 +2013,7 @@ bool KaelthasSunstriderAvoidFlameStrikeAction::Execute(Event event)
 
     Position safestPos = FindSafestNearbyPosition(bot, flameStrikes, 30.0f, hazardRadius);
 
-    bot->AttackStop();
-    bot->InterruptNonMeleeSpells(true);
+    botAI->Reset();
     return MoveTo(TEMPEST_KEEP_MAP_ID, safestPos.GetPositionX(), safestPos.GetPositionY(),
                   safestPos.GetPositionZ(), false, false, false, true,
                   MovementPriority::MOVEMENT_COMBAT, true, false);
@@ -2207,7 +2214,7 @@ bool KaelthasSunstriderSpreadOutInMidairAction::Execute(Event event)
     if (!group)
         return false;
 
-    const float minSpreadDistance = 15.0f;
+    const float minSpreadDistance = 16.0f;
 
     std::vector<Player*> nearbyPlayers;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
