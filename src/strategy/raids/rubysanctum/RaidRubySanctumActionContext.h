@@ -20,6 +20,7 @@ public:
         // General Zarithrian
         creators["general zarithrian position"] = &RaidRubySanctumActionContext::zarithrian_position;
         creators["general zarithrian attack"] = &RaidRubySanctumActionContext::zarithrian_attack;
+        creators["zarithrian taunt swap"] = &RaidRubySanctumActionContext::zarithrian_taunt_swap;
 
         // Halion
         creators["halion position"] = &RaidRubySanctumActionContext::halion_position;
@@ -48,6 +49,7 @@ private:
 
     static Action* zarithrian_position(PlayerbotAI* ai) { return new ZarithrianPositionAction(ai); }
     static Action* zarithrian_attack(PlayerbotAI* ai) { return new ZarithrianAttackAction(ai); }
+    static Action* zarithrian_taunt_swap(PlayerbotAI* ai) { return new ZarithrianTauntSwapAction(ai); }
 
     static Action* halion_position(PlayerbotAI* ai) { return new HalionPositionAction(ai); }
     static Action* halion_attack(PlayerbotAI* ai) { return new HalionAttackAction(ai); }
