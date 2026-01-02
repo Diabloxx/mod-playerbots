@@ -8,7 +8,7 @@ void RaidTempestKeepStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("crimson hand centurion cast polymorph", ACTION_RAID + 1), nullptr)
     ));
 
-    // Al'ar
+    // Al'ar <Phoenix God>
     triggers.push_back(new TriggerNode("al'ar pulling boss",
         NextAction::array(0, new NextAction("al'ar misdirect boss to main tank", ACTION_EMERGENCY + 1), nullptr)
     ));
@@ -69,6 +69,7 @@ void RaidTempestKeepStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("high astromancer solarian tank voidwalker", ACTION_EMERGENCY + 1),
             new NextAction("high astromancer solarian cast fear ward on main tank", ACTION_RAID + 2), nullptr)
     ));
+
     // Kael'thas Sunstrider <Lord of the Blood Elves>
     triggers.push_back(new TriggerNode("kael'thas sunstrider thaladred is fixated on bot",
         NextAction::array(0, new NextAction("kael'thas sunstrider kite thaladred", ACTION_EMERGENCY + 6), nullptr)
@@ -93,10 +94,10 @@ void RaidTempestKeepStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("kael'thas sunstrider telonicus engaged by first assist tank",
         NextAction::array(0, new NextAction("kael'thas sunstrider first assist tank position telonicus", ACTION_RAID + 1), nullptr)
     ));
-    triggers.push_back(new TriggerNode("kael'thas sunstrider melee tanks need dedicated healer in phase 3",
-        NextAction::array(0, new NextAction("kael'thas sunstrider position phase 3 tank healer", ACTION_RAID + 2), nullptr)
+    triggers.push_back(new TriggerNode("kael'thas sunstrider need dedicated bots for sanguinar and telonicus in phase 3",
+        NextAction::array(0, new NextAction("kael'thas sunstrider handle sanguinar and telonicus in phase 3", ACTION_RAID + 2), nullptr)
     ));
-        triggers.push_back(new TriggerNode("kael'thas sunstrider determining advisor kill order",
+    triggers.push_back(new TriggerNode("kael'thas sunstrider determining advisor kill order",
         NextAction::array(0, new NextAction("kael'thas sunstrider assign advisor dps priority", ACTION_RAID + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("kael'thas sunstrider waiting for tanks to get aggro on advisors",
@@ -123,10 +124,10 @@ void RaidTempestKeepStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("kael'thas sunstrider avoid flame strike", ACTION_EMERGENCY + 8), nullptr)
     ));
     triggers.push_back(new TriggerNode("kael'thas sunstrider phoenixes and eggs are spawning",
-        NextAction::array(0, new NextAction("kael'thas sunstrider round up phoenixes and focus down eggs", ACTION_RAID + 1), nullptr)
+        NextAction::array(0, new NextAction("kael'thas sunstrider handle phoenixes and eggs", ACTION_RAID + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("kael'thas sunstrider raid member is mind controlled",
-        NextAction::array(0, new NextAction("kael'thas sunstrider break mind control with infinity blade", ACTION_EMERGENCY + 1), nullptr)
+        NextAction::array(0, new NextAction("kael'thas sunstrider break mind control", ACTION_EMERGENCY + 1), nullptr)
     ));
     triggers.push_back(new TriggerNode("kael'thas sunstrider boss is casting pyroblast",
         NextAction::array(0, new NextAction("kael'thas sunstrider break through shock barrier", ACTION_EMERGENCY + 7), nullptr)
@@ -138,18 +139,21 @@ void RaidTempestKeepStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void RaidTempestKeepStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
+    // Alar <Phoenix God>
     multipliers.push_back(new AlarMoveBetweenPlatformsMultiplier(botAI));
     multipliers.push_back(new AlarDisableDisperseMultiplier(botAI));
     multipliers.push_back(new AlarDisableTankAssistMultiplier(botAI));
     multipliers.push_back(new AlarStayAwayFromRebirthMultiplier(botAI));
     multipliers.push_back(new AlarPhase2NoTankingIfArmorMeltedMultiplier(botAI));
 
-    multipliers.push_back(new VoidReaverDisableTankActionsMultiplier(botAI));
+    // Void Reaver
     multipliers.push_back(new VoidReaverMaintainPositionsMultiplier(botAI));
 
+    // High Astromancer Solarian
     multipliers.push_back(new HighAstromancerSolarianDisableTankAssistMultiplier(botAI));
     multipliers.push_back(new HighAstromancerSolarianMaintainPositionMultiplier(botAI));
 
+    // Kael'thas Sunstrider <Lord of the Blood Elves>
     multipliers.push_back(new KaelthasSunstriderKiteThaladredMultiplier(botAI));
     multipliers.push_back(new KaelthasSunstriderWaitForDpsMultiplier(botAI));
     multipliers.push_back(new KaelthasSunstriderControlMisdirectionMultiplier(botAI));

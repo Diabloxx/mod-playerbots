@@ -104,8 +104,8 @@ public:
         creators["kael'thas sunstrider first assist tank position telonicus"] =
             &RaidTempestKeepActionContext::kaelthas_sunstrider_first_assist_tank_position_telonicus;
 
-        creators["kael'thas sunstrider position phase 3 tank healer"] =
-            &RaidTempestKeepActionContext::kaelthas_sunstrider_position_phase_3_tank_healer;
+        creators["kael'thas sunstrider handle sanguinar and telonicus in phase 3"] =
+            &RaidTempestKeepActionContext::kaelthas_sunstrider_handle_sanguinar_and_telonicus_in_phase_3;
 
         creators["kael'thas sunstrider assign advisor dps priority"] =
             &RaidTempestKeepActionContext::kaelthas_sunstrider_assign_advisor_dps_priority;
@@ -137,11 +137,11 @@ public:
         creators["kael'thas sunstrider avoid flame strike"] =
             &RaidTempestKeepActionContext::kaelthas_sunstrider_avoid_flame_strike;
 
-        creators["kael'thas sunstrider round up phoenixes and focus down eggs"] =
-            &RaidTempestKeepActionContext::kaelthas_sunstrider_round_up_phoenixes_and_focus_down_eggs;
+        creators["kael'thas sunstrider handle phoenixes and eggs"] =
+            &RaidTempestKeepActionContext::kaelthas_sunstrider_handle_phoenixes_and_eggs;
 
-        creators["kael'thas sunstrider break mind control with infinity blade"] =
-            &RaidTempestKeepActionContext::kaelthas_sunstrider_break_mind_control_with_infinity_blade;
+        creators["kael'thas sunstrider break mind control"] =
+            &RaidTempestKeepActionContext::kaelthas_sunstrider_break_mind_control;
 
         creators["kael'thas sunstrider break through shock barrier"] =
             &RaidTempestKeepActionContext::kaelthas_sunstrider_break_through_shock_barrier;
@@ -246,8 +246,8 @@ private:
     static Action* kaelthas_sunstrider_first_assist_tank_position_telonicus(
         PlayerbotAI* botAI) { return new KaelthasSunstriderFirstAssistTankPositionTelonicusAction(botAI); }
 
-    static Action* kaelthas_sunstrider_position_phase_3_tank_healer(
-        PlayerbotAI* botAI) { return new KaelthasSunstriderPositionPhase3TankHealerAction(botAI); }
+    static Action* kaelthas_sunstrider_handle_sanguinar_and_telonicus_in_phase_3(
+        PlayerbotAI* botAI) { return new KaelthasSunstriderHandleSanguinarAndTelonicusInPhase3Action(botAI); }
 
     static Action* kaelthas_sunstrider_assign_advisor_dps_priority(
         PlayerbotAI* botAI) { return new KaelthasSunstriderAssignAdvisorDpsPriorityAction(botAI); }
@@ -279,11 +279,11 @@ private:
     static Action* kaelthas_sunstrider_avoid_flame_strike(
         PlayerbotAI* botAI) { return new KaelthasSunstriderAvoidFlameStrikeAction(botAI); }
 
-    static Action* kaelthas_sunstrider_round_up_phoenixes_and_focus_down_eggs(
-        PlayerbotAI* botAI) { return new KaelthasSunstriderRoundUpPhoenixesAndFocusDownEggsAction(botAI); }
+    static Action* kaelthas_sunstrider_handle_phoenixes_and_eggs(
+        PlayerbotAI* botAI) { return new KaelthasSunstriderHandlePhoenixesAndEggsAction(botAI); }
 
-    static Action* kaelthas_sunstrider_break_mind_control_with_infinity_blade(
-        PlayerbotAI* botAI) { return new KaelthasSunstriderBreakMindControlWithInfinityBladeAction(botAI); }
+    static Action* kaelthas_sunstrider_break_mind_control(
+        PlayerbotAI* botAI) { return new KaelthasSunstriderBreakMindControlAction(botAI); }
 
     static Action* kaelthas_sunstrider_break_through_shock_barrier(
         PlayerbotAI* botAI) { return new KaelthasSunstriderBreakThroughShockBarrierAction(botAI); }

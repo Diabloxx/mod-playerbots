@@ -284,11 +284,11 @@ public:
     bool Execute(Event event) override;
 };
 
-class KaelthasSunstriderPositionPhase3TankHealerAction : public AttackAction
+class KaelthasSunstriderHandleSanguinarAndTelonicusInPhase3Action : public MovementAction
 {
 public:
-    KaelthasSunstriderPositionPhase3TankHealerAction(
-        PlayerbotAI* botAI, std::string const name = "kael'thas sunstrider position phase 3 tank healer") : AttackAction(botAI, name) {}
+    KaelthasSunstriderHandleSanguinarAndTelonicusInPhase3Action(
+        PlayerbotAI* botAI, std::string const name = "kael'thas sunstrider handle sanguinar and telonicus in phase 3") : MovementAction(botAI, name) {}
     bool Execute(Event event) override;
 };
 
@@ -382,19 +382,19 @@ public:
     bool Execute(Event event) override;
 };
 
-class KaelthasSunstriderRoundUpPhoenixesAndFocusDownEggsAction : public AttackAction
+class KaelthasSunstriderHandlePhoenixesAndEggsAction : public AttackAction
 {
 public:
-    KaelthasSunstriderRoundUpPhoenixesAndFocusDownEggsAction(
-        PlayerbotAI* botAI, std::string const name = "kael'thas sunstrider round up phoenixes and focus down eggs") : AttackAction(botAI, name) {}
+    KaelthasSunstriderHandlePhoenixesAndEggsAction(
+        PlayerbotAI* botAI, std::string const name = "kael'thas sunstrider handle phoenixes and eggs") : AttackAction(botAI, name) {}
     bool Execute(Event event) override;
 };
 
-class KaelthasSunstriderBreakMindControlWithInfinityBladeAction : public AttackAction
+class KaelthasSunstriderBreakMindControlAction : public AttackAction
 {
 public:
-    KaelthasSunstriderBreakMindControlWithInfinityBladeAction(
-        PlayerbotAI* botAI, std::string const name = "kael'thas sunstrider break mind control with infinity blade") : AttackAction(botAI, name) {}
+    KaelthasSunstriderBreakMindControlAction(
+        PlayerbotAI* botAI, std::string const name = "kael'thas sunstrider break mind control") : AttackAction(botAI, name) {}
     bool Execute(Event event) override;
 };
 

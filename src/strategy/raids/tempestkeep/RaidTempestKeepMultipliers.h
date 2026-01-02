@@ -3,6 +3,8 @@
 
 #include "Multiplier.h"
 
+// Al'ar <Phoenix God>
+
 class AlarMoveBetweenPlatformsMultiplier : public Multiplier
 {
 public:
@@ -43,13 +45,7 @@ public:
     virtual float GetValue(Action* action);
 };
 
-class VoidReaverDisableTankActionsMultiplier : public Multiplier
-{
-public:
-    VoidReaverDisableTankActionsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "void reaver disable tank actions multiplier") {}
-    virtual float GetValue(Action* action);
-};
+// Void Reaver
 
 class VoidReaverMaintainPositionsMultiplier : public Multiplier
 {
@@ -58,6 +54,8 @@ public:
         PlayerbotAI* botAI) : Multiplier(botAI, "void reaver maintain positions multiplier") {}
     virtual float GetValue(Action* action);
 };
+
+// High Astromancer Solarian
 
 class HighAstromancerSolarianDisableTankAssistMultiplier : public Multiplier
 {
@@ -74,6 +72,8 @@ public:
         PlayerbotAI* botAI) : Multiplier(botAI, "high astromancer solarian maintain position multiplier") {}
     virtual float GetValue(Action* action);
 };
+
+// Kael'thas Sunstrider <Lord of the Blood Elves>
 
 class KaelthasSunstriderKiteThaladredMultiplier : public Multiplier
 {
