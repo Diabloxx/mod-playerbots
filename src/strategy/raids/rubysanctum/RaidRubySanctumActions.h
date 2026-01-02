@@ -28,8 +28,9 @@ public:
 
     bool Execute(Event event) override
     {
-        // Move away from group center; this is reliable for "run out" mechanics.
-        return MoveFromGroup(radius);
+        // Move away from group center; keep it bounded so we don't outrange healers.
+        float bounded = std::min(std::max(radius, 8.0f), 22.0f);
+        return MoveFromGroup(bounded);
     }
 
 private:
@@ -107,7 +108,26 @@ public:
         if (!boss)
             return false;
 
-        return MoveNear(boss, dist, MovementPriority::MOVEMENT_COMBAT);
+        // Tanks: just keep contact distance.
+        if (botAI->IsTank(bot))
+            return MoveNear(boss, std::max(2.0f, dist), MovementPriority::MOVEMENT_COMBAT);
+
+        // Non-tanks: never stand in front of dragons/bosses with frontal cleave/breath.
+        // Use existing rear-flank movement which tries to position behind the target.
+        if (botAI->IsMelee(bot))
+        {
+            RearFlankAction rear(botAI, 2.5f);
+            if (rear.isUseful())
+                return rear.Execute(event);
+            return MoveNear(boss, 3.0f, MovementPriority::MOVEMENT_COMBAT);
+        }
+
+        // Ranged/healers: keep a wider ring to reduce stacking.
+        float desired = std::max(dist, 15.0f);
+        if (botAI->IsHeal(bot))
+            desired = std::min(std::max(dist, 18.0f), 28.0f);
+
+        return MoveNear(boss, desired, MovementPriority::MOVEMENT_COMBAT);
     }
 
 private:
