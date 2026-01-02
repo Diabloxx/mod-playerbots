@@ -218,11 +218,15 @@ public:
 
     bool IsActive() override
     {
-        Unit* boss = AI_VALUE2(Unit*, "find target", "saviana ragefire");
-        if (!boss)
-            return false;
+        GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+        for (auto const& guid : npcs)
+        {
+            Unit* u = botAI->GetUnit(guid);
+            if (u && u->IsAlive() && u->GetEntry() == RubySanctum::NPC_SAVIANA_RAGEFIRE)
+                return u->HasAura(RubySanctum::SPELL_ENRAGE);
+        }
 
-        return boss->HasAura(RubySanctum::SPELL_ENRAGE);
+        return false;
     }
 };
 

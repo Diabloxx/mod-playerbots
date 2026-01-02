@@ -41,11 +41,11 @@ class RaidRubySanctumActionContext : public NamedObjectContext<Action>
 
     static Action* baltharus_position(PlayerbotAI* ai)
     {
-        return new RubySanctumPositionToBossAction(ai, "baltharus position", "baltharus the warborn", 6.0f);
+        return new RubySanctumPositionToBossAction(ai, "baltharus position", RubySanctum::NPC_BALTHARUS_THE_WARBORN, 6.0f);
     }
     static Action* baltharus_attack(PlayerbotAI* ai)
     {
-        return new RubySanctumAttackBossAction(ai, "baltharus attack", "baltharus the warborn");
+        return new RubySanctumAttackBossAction(ai, "baltharus attack", RubySanctum::NPC_BALTHARUS_THE_WARBORN);
     }
     static Action* baltharus_brand_run_out(PlayerbotAI* ai)
     {
@@ -54,12 +54,11 @@ class RaidRubySanctumActionContext : public NamedObjectContext<Action>
 
     static Action* saviana_position(PlayerbotAI* ai)
     {
-        // ranged/heals generally spread; default to a mid-range anchor
-        return new RubySanctumPositionToBossAction(ai, "saviana position", "saviana ragefire", 18.0f);
+        return new RubySanctumPositionToBossAction(ai, "saviana position", RubySanctum::NPC_SAVIANA_RAGEFIRE, 18.0f);
     }
     static Action* saviana_attack(PlayerbotAI* ai)
     {
-        return new RubySanctumAttackBossAction(ai, "saviana attack", "saviana ragefire");
+        return new RubySanctumAttackBossAction(ai, "saviana attack", RubySanctum::NPC_SAVIANA_RAGEFIRE);
     }
     static Action* saviana_run_out(PlayerbotAI* ai)
     {
@@ -69,48 +68,48 @@ class RaidRubySanctumActionContext : public NamedObjectContext<Action>
 
     static Action* zarithrian_position(PlayerbotAI* ai)
     {
-        return new RubySanctumPositionToBossAction(ai, "general zarithrian position", "general zarithrian", 8.0f);
+        return new RubySanctumPositionToBossAction(ai, "general zarithrian position", RubySanctum::NPC_GENERAL_ZARITHRIAN, 8.0f);
     }
     static Action* zarithrian_attack(PlayerbotAI* ai)
     {
-        return new RubySanctumAttackBossAction(ai, "general zarithrian attack", "general zarithrian");
+        return new RubySanctumAttackBossAction(ai, "general zarithrian attack", RubySanctum::NPC_GENERAL_ZARITHRIAN);
     }
 
     static Action* halion_position(PlayerbotAI* ai)
     {
-        return new RubySanctumPositionToBossAction(ai, "halion position", "halion", 18.0f);
+        return new RubySanctumPositionToBossAction(ai, "halion position", RubySanctum::NPC_HALION, 18.0f);
     }
     static Action* halion_attack(PlayerbotAI* ai)
     {
-        return new RubySanctumAttackBossAction(ai, "halion attack", "halion");
+        return new RubySanctumAttackBossAction(ai, "halion attack", RubySanctum::NPC_HALION);
     }
 
     static Action* halion_twilight_position(PlayerbotAI* ai)
     {
-        return new RubySanctumPositionToBossAction(ai, "halion twilight position", "halion", 18.0f);
+        return new RubySanctumPositionToBossAction(ai, "halion twilight position", RubySanctum::NPC_HALION, 18.0f);
     }
     static Action* halion_twilight_attack(PlayerbotAI* ai)
     {
-        return new RubySanctumAttackBossAction(ai, "halion twilight attack", "halion");
+        return new RubySanctumAttackBossAction(ai, "halion twilight attack", RubySanctum::NPC_HALION);
     }
 
     static Action* halion_split_position(PlayerbotAI* ai)
     {
-        return new RubySanctumPositionToBossAction(ai, "halion split position", "halion", 18.0f);
+        return new RubySanctumPositionToBossAction(ai, "halion split position", RubySanctum::NPC_HALION, 18.0f);
     }
     static Action* halion_split_attack(PlayerbotAI* ai)
     {
-        return new RubySanctumAttackBossAction(ai, "halion split attack", "halion");
+        return new RubySanctumAttackBossAction(ai, "halion split attack", RubySanctum::NPC_HALION);
     }
 
     static Action* baltharus_face_away(PlayerbotAI* ai)
     {
-        return new RubySanctumFaceBossAwayAction(ai, "baltharus face away", "baltharus the warborn");
+        return new RubySanctumFaceBossAwayAction(ai, "baltharus face away", RubySanctum::NPC_BALTHARUS_THE_WARBORN);
     }
 
     static Action* saviana_face_away(PlayerbotAI* ai)
     {
-        return new RubySanctumFaceBossAwayAction(ai, "saviana face away", "saviana ragefire");
+        return new RubySanctumFaceBossAwayAction(ai, "saviana face away", RubySanctum::NPC_SAVIANA_RAGEFIRE);
     }
 };
 

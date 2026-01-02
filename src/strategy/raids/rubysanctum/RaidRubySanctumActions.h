@@ -7,6 +7,34 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 
+namespace RubySanctum
+{
+    static constexpr uint32 NPC_BALTHARUS_THE_WARBORN = 39751;
+    static constexpr uint32 NPC_SAVIANA_RAGEFIRE = 39747;
+    static constexpr uint32 NPC_GENERAL_ZARITHRIAN = 39746;
+    static constexpr uint32 NPC_HALION = 39863;
+}
+
+static Unit* GetNearestAliveHostileByEntry(PlayerbotAI* ai, uint32 entry)
+{
+    if (!ai)
+        return nullptr;
+
+    AiObjectContext* ctx = ai->GetAiObjectContext();
+    if (!ctx)
+        return nullptr;
+
+    GuidVector npcs = ctx->GetValue<GuidVector>("nearest hostile npcs")->Get();
+    for (auto const& guid : npcs)
+    {
+        Unit* u = ai->GetUnit(guid);
+        if (u && u->IsAlive() && u->GetEntry() == entry)
+            return u;
+    }
+
+    return nullptr;
+}
+
 class RubySanctumSavianaSpreadAction : public MovementAction
 {
 public:
@@ -40,8 +68,8 @@ private:
 class RubySanctumFaceBossAwayAction : public MovementAction
 {
 public:
-    RubySanctumFaceBossAwayAction(PlayerbotAI* ai, std::string const& name, std::string const& bossName)
-        : MovementAction(ai, name), bossName(bossName)
+    RubySanctumFaceBossAwayAction(PlayerbotAI* ai, std::string const& name, uint32 bossEntry)
+        : MovementAction(ai, name), bossEntry(bossEntry)
     {
     }
 
@@ -50,7 +78,7 @@ public:
         if (!botAI->IsTank(bot))
             return false;
 
-        Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
+        Unit* boss = GetNearestAliveHostileByEntry(botAI, bossEntry);
         if (!boss)
             return false;
 
@@ -91,20 +119,20 @@ public:
     }
 
 private:
-    std::string bossName;
+    uint32 bossEntry;
 };
 
 class RubySanctumPositionToBossAction : public MovementAction
 {
 public:
-    RubySanctumPositionToBossAction(PlayerbotAI* ai, std::string const& name, std::string const& bossName, float dist)
-        : MovementAction(ai, name), bossName(bossName), dist(dist)
+    RubySanctumPositionToBossAction(PlayerbotAI* ai, std::string const& name, uint32 bossEntry, float dist)
+        : MovementAction(ai, name), bossEntry(bossEntry), dist(dist)
     {
     }
 
     bool Execute(Event event) override
     {
-        Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
+        Unit* boss = GetNearestAliveHostileByEntry(botAI, bossEntry);
         if (!boss)
             return false;
 
@@ -131,21 +159,21 @@ public:
     }
 
 private:
-    std::string bossName;
+    uint32 bossEntry;
     float dist;
 };
 
 class RubySanctumAttackBossAction : public AttackAction
 {
 public:
-    RubySanctumAttackBossAction(PlayerbotAI* ai, std::string const& name, std::string const& bossName)
-        : AttackAction(ai, name), bossName(bossName)
+    RubySanctumAttackBossAction(PlayerbotAI* ai, std::string const& name, uint32 bossEntry)
+        : AttackAction(ai, name), bossEntry(bossEntry)
     {
     }
 
     bool Execute(Event event) override
     {
-        Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
+        Unit* boss = GetNearestAliveHostileByEntry(botAI, bossEntry);
         if (!boss)
             return false;
 
@@ -153,7 +181,7 @@ public:
     }
 
 private:
-    std::string bossName;
+    uint32 bossEntry;
 };
 
 // Ruby Sanctum actions are currently provided by `RaidRubySanctumActionContext.*`.
