@@ -7,13 +7,7 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 
-namespace RubySanctum
-{
-    static constexpr uint32 NPC_BALTHARUS_THE_WARBORN = 39751;
-    static constexpr uint32 NPC_SAVIANA_RAGEFIRE = 39747;
-    static constexpr uint32 NPC_GENERAL_ZARITHRIAN = 39746;
-    static constexpr uint32 NPC_HALION = 39863;
-}
+#include "RaidRubySanctumTriggers.h" // Include triggers header for shared constants
 
 static Unit* GetNearestAliveHostileByEntry(PlayerbotAI* ai, uint32 entry)
 {
