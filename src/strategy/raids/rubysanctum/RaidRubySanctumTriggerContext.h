@@ -28,6 +28,9 @@ public:
         creators["soul consumption"] = &RaidRubySanctumTriggerContext::soul_consumption;
         creators["twilight cutter"] = &RaidRubySanctumTriggerContext::twilight_cutter;
         creators["meteor strike"] = &RaidRubySanctumTriggerContext::meteor_strike;
+
+        creators["saviana enrage"] = &RaidRubySanctumTriggerContext::saviana_enrage;
+        creators["saviana conflagration"] = &RaidRubySanctumTriggerContext::saviana_conflagration;
     }
 
 private:
@@ -39,7 +42,7 @@ private:
     static Trigger* halion_twilight(PlayerbotAI* ai) { return new HalionTwilightTrigger(ai); }
     static Trigger* halion_both(PlayerbotAI* ai) { return new HalionBothTrigger(ai); }
 
-    static Trigger* fiery_combustion(PlayerbotAI* ai) { return new RubySanctumConflagrationTrigger(ai); }
+    static Trigger* fiery_combustion(PlayerbotAI* ai) { return new RubySanctumFieryCombustionTrigger(ai); }
     static Trigger* enervating_brand(PlayerbotAI* ai) { return new RubySanctumEnervatingBrandTrigger(ai); }
 
     static Trigger* cleave_armor(PlayerbotAI* ai) { return new RubySanctumCleaveArmorTrigger(ai); }
@@ -49,6 +52,9 @@ private:
     static Trigger* soul_consumption(PlayerbotAI* ai) { return new RubySanctumSoulConsumptionTrigger(ai); }
     static Trigger* twilight_cutter(PlayerbotAI* ai) { return new RubySanctumTwilightCutterTrigger(ai); }
     static Trigger* meteor_strike(PlayerbotAI* ai) { return new RubySanctumMeteorStrikeTrigger(ai); }
+
+    static Trigger* saviana_enrage(PlayerbotAI* ai) { return new RubySanctumSavianaEnrageTrigger(ai); }
+    static Trigger* saviana_conflagration(PlayerbotAI* ai) { return new RubySanctumSavianaConflagrationTrigger(ai); }
 };
 
 #endif

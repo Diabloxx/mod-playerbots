@@ -15,6 +15,7 @@
 #include "RaidUlduarStrategy.h"
 #include "RaidOnyxiaStrategy.h"
 #include "RaidIccStrategy.h"
+#include "rubysanctum/RaidRubySanctumStrategy.h"
 
 class RaidStrategyContext : public NamedObjectContext<Strategy>
 {
@@ -34,6 +35,7 @@ public:
         creators["uld"] = &RaidStrategyContext::uld;
         creators["onyxia"] = &RaidStrategyContext::onyxia;
         creators["icc"] = &RaidStrategyContext::icc;
+        creators["wotlk-ruby-sanctum"] = &RaidStrategyContext::ruby_sanctum;
     }
 
 private:
@@ -50,6 +52,7 @@ private:
     static Strategy* onyxia(PlayerbotAI* botAI) { return new RaidOnyxiaStrategy(botAI); }
     static Strategy* uld(PlayerbotAI* botAI) { return new RaidUlduarStrategy(botAI); }
     static Strategy* icc(PlayerbotAI* botAI) { return new RaidIccStrategy(botAI); }
+    static Strategy* ruby_sanctum(PlayerbotAI* botAI) { return new RaidRubySanctumStrategy(botAI); }
 };
 
 #endif

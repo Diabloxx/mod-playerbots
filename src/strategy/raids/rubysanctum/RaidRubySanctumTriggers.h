@@ -23,6 +23,20 @@ namespace RubySanctum
     static constexpr uint32 SPELL_SOUL_CONSUMPTION = 74792;
     static constexpr uint32 SPELL_TWILIGHT_CUTTER = 74768;
     static constexpr uint32 SPELL_METEOR_STRIKE_AOE_DAMAGE = 74648;
+
+    // Baltharus
+    static constexpr uint32 SPELL_REPELLING_WAVE = 74509;
+
+    // Saviana
+    static constexpr uint32 SPELL_FLAME_BREATH = 74403;
+    static constexpr uint32 SPELL_ENRAGE = 78722;
+
+    // Conflagration (Saviana)
+    // Beacon is already present; Conflagration aura varies by difficulty, but we at least react to the common one.
+    static constexpr uint32 SPELL_CONFLAGRATION_AURA = 74453;
+
+    static constexpr char const* SPELLNAME_CLEAVE_ARMOR = "cleave armor";
+    static constexpr char const* SPELLNAME_ENERVATING_BRAND = "enervating brand";
 }
 
 class RubySanctumBossBaseTrigger : public Trigger
@@ -103,7 +117,12 @@ class RubySanctumEnervatingBrandTrigger : public Trigger
 {
 public:
     RubySanctumEnervatingBrandTrigger(PlayerbotAI* ai) : Trigger(ai, "enervating brand") {}
-    bool IsActive() override { return bot->HasAura(RubySanctum::SPELL_ENERVATING_BRAND); }
+
+    bool IsActive() override
+    {
+        // Brand is the key mechanic that requires the affected player to move away.
+        return bot->HasAura(RubySanctum::SPELL_ENERVATING_BRAND);
+    }
 };
 
 class RubySanctumCleaveArmorTrigger : public Trigger
@@ -117,7 +136,7 @@ public:
             return false;
 
         // Trigger when stacks are getting high.
-        Aura* a = botAI->GetAura(RubySanctum::SPELL_CLEAVE_ARMOR, bot, false, false);
+        Aura* a = botAI->GetAura(RubySanctum::SPELLNAME_CLEAVE_ARMOR, bot, false, false);
         return a && a->GetStackAmount() >= 4;
     }
 };
@@ -172,8 +191,8 @@ public:
         if (bot->HasAura(RubySanctum::SPELL_TWILIGHT_CUTTER))
             return true;
 
-        Creature* carrier = RubySanctum::FindNearestCreatureByEntry(botAI, bot, RubySanctum::NPC_ORB_CARRIER, 12.0f);
-        return carrier != nullptr;
+        // Use core API directly (no RubySanctum helper in this module)
+        return bot->FindNearestCreature(RubySanctum::NPC_ORB_CARRIER, 12.0f) != nullptr;
     }
 };
 
@@ -188,8 +207,37 @@ public:
         if (bot->HasAura(RubySanctum::SPELL_METEOR_STRIKE_AOE_DAMAGE))
             return true;
 
-        Creature* mark = RubySanctum::FindNearestCreatureByEntry(botAI, bot, RubySanctum::NPC_METEOR_STRIKE_MARK, 18.0f);
-        return mark != nullptr;
+        return bot->FindNearestCreature(RubySanctum::NPC_METEOR_STRIKE_MARK, 18.0f) != nullptr;
+    }
+};
+
+class RubySanctumSavianaEnrageTrigger : public Trigger
+{
+public:
+    RubySanctumSavianaEnrageTrigger(PlayerbotAI* ai) : Trigger(ai, "saviana enrage") {}
+
+    bool IsActive() override
+    {
+        Unit* boss = AI_VALUE2(Unit*, "find target", "saviana ragefire");
+        if (!boss)
+            return false;
+
+        return boss->HasAura(RubySanctum::SPELL_ENRAGE);
+    }
+};
+
+class RubySanctumSavianaConflagrationTrigger : public Trigger
+{
+public:
+    RubySanctumSavianaConflagrationTrigger(PlayerbotAI* ai) : Trigger(ai, "saviana conflagration") {}
+
+    bool IsActive() override
+    {
+        // If we are beaconed, we must run out. If conflagration is already ticking, keep distance.
+        if (bot->HasAura(RubySanctum::SPELL_FLAME_BEACON))
+            return true;
+
+        return bot->HasAura(RubySanctum::SPELL_CONFLAGRATION_AURA);
     }
 };
 

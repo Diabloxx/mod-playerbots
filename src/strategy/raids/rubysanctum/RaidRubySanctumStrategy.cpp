@@ -62,9 +62,10 @@ void RaidRubySanctumStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("baltharus position", ACTION_MOVE + 2),
             nullptr)));
 
-    // Saviana: Conflagration move out
+    // Saviana: Conflagration / targeted mechanic -> spread out (in addition to moving)
     triggers.push_back(new TriggerNode("fiery combustion",
         NextAction::array(0,
+            new NextAction("saviana spread", ACTION_MOVE + 4),
             new NextAction("saviana position", ACTION_MOVE + 2),
             new NextAction("move out of fire", ACTION_MOVE),
             nullptr)));
@@ -83,9 +84,10 @@ void RaidRubySanctumStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             new NextAction("general zarithrian attack", ACTION_RAID + 1),
             nullptr)));
 
-    // Saviana: Flame Beacon -> spread / move to safe ranged position
+    // Saviana: Flame Beacon -> spread to reduce collateral
     triggers.push_back(new TriggerNode("flame beacon",
         NextAction::array(0,
+            new NextAction("saviana spread", ACTION_MOVE + 5),
             new NextAction("saviana position", ACTION_MOVE + 3),
             nullptr)));
 
@@ -114,6 +116,38 @@ void RaidRubySanctumStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("twilight cutter",
         NextAction::array(0,
             new NextAction("halion twilight position", ACTION_MOVE + 5),
+            nullptr)));
+
+    // Baltharus: tank should keep boss faced away from raid
+    triggers.push_back(new TriggerNode("baltharus",
+        NextAction::array(0,
+            new NextAction("baltharus face away", ACTION_MOVE + 6),
+            nullptr)));
+
+    // Baltharus: Enervating Brand -> affected player runs out
+    triggers.push_back(new TriggerNode("enervating brand",
+        NextAction::array(0,
+            new NextAction("baltharus brand run out", ACTION_MOVE + 7),
+            nullptr)));
+
+    // Saviana: tank should keep boss faced away from raid
+    triggers.push_back(new TriggerNode("saviana",
+        NextAction::array(0,
+            new NextAction("saviana face away", ACTION_MOVE + 6),
+            nullptr)));
+
+    // Saviana: Flame Beacon / Conflagration -> run out hard
+    triggers.push_back(new TriggerNode("saviana conflagration",
+        NextAction::array(0,
+            new NextAction("saviana run out", ACTION_MOVE + 8),
+            new NextAction("saviana spread", ACTION_MOVE + 5),
+            nullptr)));
+
+    // Saviana: Enrage should be dispelled (Tranquilizing Shot / Anesthetic Poison)
+    // For now, we just increase spacing (reduces collateral from raid-wide pulses and movement overlap).
+    triggers.push_back(new TriggerNode("saviana enrage",
+        NextAction::array(0,
+            new NextAction("saviana spread", ACTION_MOVE + 2),
             nullptr)));
 }
 
