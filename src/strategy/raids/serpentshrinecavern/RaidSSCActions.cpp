@@ -80,8 +80,7 @@ bool UnderbogColossusEscapeToxicPoolAction::Execute(Event event)
 
 bool GreyheartTidecallerMarkWaterElementalTotemAction::Execute(Event event)
 {
-    Unit* totem = GetFirstAliveUnitByEntry(botAI, NPC_WATER_ELEMENTAL_TOTEM);
-    if (totem)
+    if (Unit* totem = GetFirstAliveUnitByEntry(botAI, NPC_WATER_ELEMENTAL_TOTEM))
         MarkTargetWithSkull(bot, totem);
 
     return false;
@@ -283,8 +282,7 @@ bool HydrossTheUnstablePrioritizeElementalAddsAction::Execute(Event event)
 // To mitigate the effect of Water Tomb
 bool HydrossTheUnstableFrostPhaseSpreadOutAction::Execute(Event event)
 {
-    Unit* hydross = AI_VALUE2(Unit*, "find target", "hydross the unstable");
-    if (!hydross)
+    if (!AI_VALUE2(Unit*, "find target", "hydross the unstable"))
         return false;
 
     if (Group* group = bot->GetGroup())
@@ -676,8 +674,7 @@ bool TheLurkerBelowManageSpoutTimerAction::Execute(Event event)
 
 bool LeotherasTheBlindTargetSpellbindersAction::Execute(Event event)
 {
-    Unit* spellbinder = GetFirstAliveUnitByEntry(botAI, NPC_GREYHEART_SPELLBINDER);
-    if (spellbinder && spellbinder->IsInCombat())
+    if (Unit* spellbinder = GetFirstAliveUnitByEntry(botAI, NPC_GREYHEART_SPELLBINDER))
         MarkTargetWithSkull(bot, spellbinder);
 
     return false;
@@ -699,7 +696,7 @@ bool LeotherasTheBlindDemonFormTankAttackBossAction::Execute(Event event)
         if (bot->GetTarget() != leotherasDemon->GetGUID())
             return Attack(leotherasDemon);
     }
-    else if (Unit* leotherasHuman = GetLeotherasHuman(botAI))
+    else if (!GetLeotherasHuman(botAI))
     {
         if (botAI->HasStrategy("tank", BotState::BOT_STATE_COMBAT))
             botAI->ChangeStrategy("-tank", BotState::BOT_STATE_COMBAT);
@@ -719,8 +716,7 @@ bool LeotherasTheBlindPositionRangedAction::Execute(Event event)
         leotherasHuman->GetVictim() != bot)
         return FleePosition(leotherasHuman->GetPosition(), 12.0f, minInterval);
 
-    Unit* leotherasDemon = GetActiveLeotherasDemon(botAI);
-    if (!leotherasDemon)
+    if (!GetActiveLeotherasDemon(botAI))
         return false;
 
     if (Group* group = bot->GetGroup())
@@ -731,8 +727,7 @@ bool LeotherasTheBlindPositionRangedAction::Execute(Event event)
             if (!member || member == bot || !member->IsAlive())
                 continue;
 
-            Player* demonFormTank = GetLeotherasDemonFormTank(botAI, bot);
-            if (demonFormTank && demonFormTank == member)
+            if (GetLeotherasDemonFormTank(botAI, bot) == member)
             {
                 if (bot->GetExactDist2d(member) < 10.0f)
                     return FleePosition(member->GetPosition(), 12.0f, minInterval);
@@ -747,12 +742,6 @@ bool LeotherasTheBlindPositionRangedAction::Execute(Event event)
 
 bool LeotherasTheBlindRunAwayFromWhirlwindAction::Execute(Event event)
 {
-    Unit* leotherasPhase3Demon = GetPhase3LeotherasDemon(botAI);
-    Player* demonFormTank = GetLeotherasDemonFormTank(botAI, bot);
-
-    if (leotherasPhase3Demon && demonFormTank && demonFormTank == bot)
-        return false;
-
     Unit* leotherasHuman = GetLeotherasHuman(botAI);
     if (leotherasHuman)
     {
@@ -773,7 +762,6 @@ bool LeotherasTheBlindRunAwayFromWhirlwindAction::Execute(Event event)
 bool LeotherasTheBlindMeleeDpsRunAwayFromBossAction::Execute(Event event)
 {
     Unit* leotherasPhase2Demon = GetPhase2LeotherasDemon(botAI);
-
     if (!leotherasPhase2Demon)
         return false;
 
@@ -1197,6 +1185,14 @@ bool FathomLordKarathressAssignDpsPriorityAction::Execute(Event event)
 
         if (bot->GetTarget() != totem->GetGUID())
             return Attack(totem);
+
+        // Direct movement order due to path between Sharkkis and totem sometimes being screwy
+        if (!bot->IsWithinMeleeRange(totem))
+        {
+            return MoveTo(SSC_MAP_ID, totem->GetPositionX(), totem->GetPositionY(),
+                          totem->GetPositionZ(), false, false, false, true,
+                          MovementPriority::MOVEMENT_COMBAT, true, false);
+        }
 
         return false;
     }
@@ -1790,7 +1786,7 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event event)
                 break;
 
             case NPC_TOXIC_SPOREBAT:
-                if (!sporebat || bot->GetExactDist2d(unit) < bot->GetExactDist2d(sporebat))
+                if (!sporebat || bot->GetDistance(unit) < bot->GetDistance(sporebat))
                     sporebat = unit;
                 break;
 
@@ -2704,18 +2700,10 @@ bool LadyVashjAvoidToxicSporesAction::Execute(Event event)
     Position safestPos = FindSafestNearbyPosition(spores, vashjCenter, maxRadius, hazardRadius);
 
     Unit* vashj = AI_VALUE2(Unit*, "find target", "lady vashj");
-    if (vashj && vashj->GetVictim() == bot)
-    {
-        return MoveTo(SSC_MAP_ID, safestPos.GetPositionX(), safestPos.GetPositionY(),
-                      safestPos.GetPositionZ(), false, false, false, true,
-                      MovementPriority::MOVEMENT_COMBAT, true, true);
-    }
-    else
-    {
-        return MoveTo(SSC_MAP_ID, safestPos.GetPositionX(), safestPos.GetPositionY(),
-                      safestPos.GetPositionZ(), false, false, false, true,
-                      MovementPriority::MOVEMENT_COMBAT, true, false);
-    }
+    bool backwards = (vashj && vashj->GetVictim() == bot);
+    return MoveTo(SSC_MAP_ID, safestPos.GetPositionX(), safestPos.GetPositionY(),
+                  safestPos.GetPositionZ(), false, false, false, true,
+                  MovementPriority::MOVEMENT_COMBAT, true, backwards);
 }
 
 Position LadyVashjAvoidToxicSporesAction::FindSafestNearbyPosition(
