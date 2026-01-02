@@ -930,7 +930,6 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
         fromPlayer->SendDirectMessage(&data);
         return;
     }
-
     if (!IsAllowedCommand(filtered) &&
         (!GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, type != CHAT_MSG_WHISPER, fromPlayer)))
         return;
@@ -2038,7 +2037,7 @@ bool PlayerbotAI::IsTank(Player* player, bool bySpec)
     switch (player->getClass())
     {
         case CLASS_DEATH_KNIGHT:
-            if (tab == DEATHKNIGHT_TAB_BLOOD)
+            if (tab == DEATH_KNIGHT_TAB_BLOOD)
             {
                 return true;
             }
@@ -2146,7 +2145,7 @@ bool PlayerbotAI::IsDps(Player* player, bool bySpec)
             }
             break;
         case CLASS_DEATH_KNIGHT:
-            if (tab != DEATHKNIGHT_TAB_BLOOD)
+            if (tab != DEATH_KNIGHT_TAB_BLOOD)
             {
                 return true;
             }
@@ -2806,7 +2805,12 @@ bool PlayerbotAI::TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel 
 
 bool PlayerbotAI::TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel)
 {
-    if (!master || !TellMasterNoFacing(text, securityLevel))
+    if (!master)
+    {
+        if (sPlayerbotAIConfig->randomBotSayWithoutMaster)
+            return TellMasterNoFacing(text, securityLevel);
+    }
+    if (!TellMasterNoFacing(text, securityLevel))
         return false;
 
     if (!bot->isMoving() && !bot->IsInCombat() && bot->GetMapId() == master->GetMapId() &&
