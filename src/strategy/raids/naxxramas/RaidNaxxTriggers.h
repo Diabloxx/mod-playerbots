@@ -99,7 +99,7 @@ public:
      FaerlinaTrigger(PlayerbotAI* ai) : Trigger(ai, "faerlina") {}
      bool IsActive() override;
  };
- 
+
 class MaexxnaTrigger : public Trigger
 {
 public:

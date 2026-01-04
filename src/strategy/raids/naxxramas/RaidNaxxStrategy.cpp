@@ -35,7 +35,7 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
      // Grand Widow Faerlina
      triggers.push_back(new TriggerNode(
          "faerlina", NextAction::array(0, new NextAction("avoid aoe", ACTION_RAID + 1), nullptr)));
- 
+
     // Maexxna
     triggers.push_back(new TriggerNode(
         "maexxna", NextAction::array(0, new NextAction("rear flank", ACTION_RAID + 1),
