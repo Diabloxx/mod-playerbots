@@ -9,7 +9,6 @@
 #include "RaidMagtheridonStrategy.h"
 #include "RaidGruulsLairStrategy.h"
 #include "RaidSSCStrategy.h"
-#include "RaidNaxxStrategy.h"
 #include "RaidOsStrategy.h"
 #include "RaidEoEStrategy.h"
 #include "RaidVoAStrategy.h"
@@ -29,7 +28,6 @@ public:
         creators["magtheridon"] = &RaidStrategyContext::magtheridon;
         creators["gruulslair"] = &RaidStrategyContext::gruulslair;
         creators["ssc"] = &RaidStrategyContext::ssc;
-        creators["naxx"] = &RaidStrategyContext::naxx;
         creators["wotlk-os"] = &RaidStrategyContext::wotlk_os;
         creators["wotlk-eoe"] = &RaidStrategyContext::wotlk_eoe;
         creators["voa"] = &RaidStrategyContext::voa;
@@ -46,7 +44,6 @@ private:
     static Strategy* magtheridon(PlayerbotAI* botAI) { return new RaidMagtheridonStrategy(botAI); }
     static Strategy* gruulslair(PlayerbotAI* botAI) { return new RaidGruulsLairStrategy(botAI); }
     static Strategy* ssc(PlayerbotAI* botAI) { return new RaidSSCStrategy(botAI); }
-    static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxStrategy(botAI); }
     static Strategy* wotlk_os(PlayerbotAI* botAI) { return new RaidOsStrategy(botAI); }
     static Strategy* wotlk_eoe(PlayerbotAI* botAI) { return new RaidEoEStrategy(botAI); }
     static Strategy* voa(PlayerbotAI* botAI) { return new RaidVoAStrategy(botAI); }
