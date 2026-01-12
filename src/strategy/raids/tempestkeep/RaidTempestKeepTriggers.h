@@ -3,6 +3,16 @@
 
 #include "Trigger.h"
 
+// General
+
+class TempestKeepTimerBotIsNotInCombatTrigger : public Trigger
+{
+public:
+    TempestKeepTimerBotIsNotInCombatTrigger(
+        PlayerbotAI* botAI) : Trigger(botAI, "tempest keep timer bot is not in combat") {}
+    bool IsActive() override;
+};
+
 // Trash
 
 class CrimsonHandCenturionCastsArcaneVolleyTrigger : public Trigger
@@ -31,11 +41,19 @@ public:
     bool IsActive() override;
 };
 
-class AlarBossSpawnsEmbersOfAlarTrigger : public Trigger
+class AlarEmbersOfAlarExplodeUponDeathTrigger : public Trigger
 {
 public:
-    AlarBossSpawnsEmbersOfAlarTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "al'ar boss spawns embers of alar") {}
+    AlarEmbersOfAlarExplodeUponDeathTrigger(
+        PlayerbotAI* botAI) : Trigger(botAI, "al'ar embers of al'ar explode upon death") {}
+    bool IsActive() override;
+};
+
+class AlarKillingEmbersOfAlarDamagesBossTrigger : public Trigger
+{
+public:
+    AlarKillingEmbersOfAlarDamagesBossTrigger(
+        PlayerbotAI* botAI) : Trigger(botAI, "al'ar killing embers of al'ar damages boss") {}
     bool IsActive() override;
 };
 
@@ -80,6 +98,14 @@ public:
 };
 
 // Void Reaver
+
+class VoidReaverBossCastsPoundingTrigger : public Trigger
+{
+public:
+    VoidReaverBossCastsPoundingTrigger(
+        PlayerbotAI* botAI) : Trigger(botAI, "void reaver boss casts pounding") {}
+    bool IsActive() override;
+};
 
 class VoidReaverKnockAwayReducesTankAggroTrigger : public Trigger
 {
@@ -131,11 +157,19 @@ public:
     bool IsActive() override;
 };
 
-class HighAstromancerSolarianTransformedIntoVoidwalkerTrigger : public Trigger
+class HighAstromancerSolarianBossTransformedIntoVoidwalkerTrigger : public Trigger
 {
 public:
-    HighAstromancerSolarianTransformedIntoVoidwalkerTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "high astromancer solarian transformed into voidwalker") {}
+    HighAstromancerSolarianBossTransformedIntoVoidwalkerTrigger(
+        PlayerbotAI* botAI) : Trigger(botAI, "high astromancer solarian boss transformed into voidwalker") {}
+    bool IsActive() override;
+};
+
+class HighAstromancerSolarianBossCastsPsychicScreamTrigger : public Trigger
+{
+public:
+    HighAstromancerSolarianBossCastsPsychicScreamTrigger(
+        PlayerbotAI* botAI) : Trigger(botAI, "high astromancer boss casts psychic scream") {}
     bool IsActive() override;
 };
 

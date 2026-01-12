@@ -10,6 +10,33 @@
 
 using namespace TempestKeepHelpers;
 
+// General
+
+bool TempestKeepClearTimersAndTrackersAction::Execute(Event event)
+{
+    bool cleared = false;
+
+    if (!initialVoidReaverPositions.empty())
+    {
+        initialVoidReaverPositions.clear();
+        cleared = true;
+    }
+
+    if (!hasReachedInitialVoidReaverPosition.empty())
+    {
+        hasReachedInitialVoidReaverPosition.clear();
+        cleared = true;
+    }
+
+    if (!advisorDpsWaitTimer.empty())
+    {
+        advisorDpsWaitTimer.clear();
+        cleared = true;
+    }
+
+    return cleared;
+}
+
 // Trash
 
 bool CrimsonHandCenturionCastPolymorphAction::Execute(Event event)
@@ -390,9 +417,6 @@ bool AlarAssistTanksPickUpEmbersAction::HandlePhase2Embers(Unit* alar)
 
 bool AlarRangedDpsPrioritizeEmbersAction::Execute(Event event)
 {
-    if (!botAI->IsRangedDps(bot))
-        return false;
-
     auto [firstEmber, secondEmber] = GetFirstTwoEmbersOfAlar(botAI);
 
     const float safeDistance = 15.0f;
@@ -510,13 +534,15 @@ bool AlarMoveAwayFromRebirthAction::Execute(Event event)
         return JumpTo(TEMPEST_KEEP_MAP_ID, ground.GetPositionX(), ground.GetPositionY(),
                       ground.GetPositionZ(), MovementPriority::MOVEMENT_FORCED);
     }
-
-    float currentDistance = bot->GetDistance2d(alar);
-    const float safeDistance = 20.0f;
-    if (currentDistance < safeDistance)
+    else
     {
-        botAI->Reset();
-        return MoveAway(alar, safeDistance - currentDistance);
+        float currentDistance = bot->GetDistance2d(alar);
+        const float safeDistance = 20.0f;
+        if (currentDistance < safeDistance)
+        {
+            botAI->Reset();
+            return MoveAway(alar, safeDistance - currentDistance);
+        }
     }
 
     return false;
@@ -600,24 +626,8 @@ bool AlarAvoidFlamePatchesAndDiveBombsAction::AvoidFlamePatch()
 
 bool AlarAvoidFlamePatchesAndDiveBombsAction::HandleDiveBomb(Unit* alar)
 {
-    int8 locationIndex = GetAlarCurrentLocationIndex(alar);
-    if (locationIndex == LOCATION_NONE)
-    {
-        Position dest;
-        locationIndex = GetAlarDestinationLocationIndex(alar, dest);
-    }
-
-    if (locationIndex == POINT_QUILL_OR_DIVE_IDX)
-    {
-        Unit* nearestPlayer = GetNearestPlayerInRadius(bot, 10.0f);
-        if (nearestPlayer)
-        {
-            return FleePosition(Position(nearestPlayer->GetPositionX(), nearestPlayer->GetPositionY(),
-                                         nearestPlayer->GetPositionZ()), 11.0f);
-        }
-    }
-    else if (alar->HasUnitState(UNIT_STATE_CASTING) &&
-             alar->FindCurrentSpellBySpellId(SPELL_REBIRTH_DIVE))
+    if (alar->HasUnitState(UNIT_STATE_CASTING) &&
+        alar->FindCurrentSpellBySpellId(SPELL_REBIRTH_DIVE))
     {
         float currentDistance = bot->GetDistance2d(alar);
         const float safeDistance = 20.0f;
@@ -626,6 +636,22 @@ bool AlarAvoidFlamePatchesAndDiveBombsAction::HandleDiveBomb(Unit* alar)
             bot->AttackStop();
             bot->InterruptNonMeleeSpells(true);
             return MoveAway(alar, safeDistance - currentDistance);
+        }
+    }
+    else
+    {
+        Position dest;
+        if (GetAlarCurrentLocationIndex(alar) == POINT_QUILL_OR_DIVE_IDX ||
+            GetAlarDestinationLocationIndex(alar, dest) == POINT_QUILL_OR_DIVE_IDX)
+        {
+            const float safeDistance = 10.0f;
+            Unit* nearestPlayer = GetNearestPlayerInRadius(bot, safeDistance);
+            if (nearestPlayer)
+            {
+                const uint32 minInterval = 0;
+                return FleePosition(Position(nearestPlayer->GetPositionX(), nearestPlayer->GetPositionY(),
+                                             nearestPlayer->GetPositionZ()), safeDistance, minInterval);
+            }
         }
     }
 
@@ -699,10 +725,6 @@ bool VoidReaverTanksPositionBossAction::Execute(Event event)
 
 bool VoidReaverRangedUseAggroDumpAbilityAction::Execute(Event event)
 {
-    Unit* voidReaver = AI_VALUE2(Unit*, "find target", "void reaver");
-    if (!voidReaver)
-        return false;
-
     botAI->Reset();
     static const std::array<const char*, 6> spells =
     {
@@ -730,12 +752,6 @@ bool VoidReaverSpreadRangedAction::Execute(Event event)
     Unit* voidReaver = AI_VALUE2(Unit*, "find target", "void reaver");
     if (!voidReaver)
         return false;
-
-    if (voidReaver->GetHealthPct() > 99.8f)
-    {
-        initialVoidReaverPositions.clear();
-        hasReachedInitialVoidReaverPosition.clear();
-    }
 
     if (initialVoidReaverPositions.empty())
     {
@@ -976,9 +992,6 @@ Unit* HighAstromancerSolarianTargetSolariumPriestsAction::AssignSolariumPriestsT
 
 bool HighAstromancerSolarianTankVoidwalkerAction::Execute(Event event)
 {
-    if (!botAI->IsMainTank(bot))
-        return false;
-
     Unit* astromancer = AI_VALUE2(Unit*, "find target", "high astromancer solarian");
     if (!astromancer)
         return false;
@@ -1001,9 +1014,6 @@ bool HighAstromancerSolarianTankVoidwalkerAction::Execute(Event event)
 
 bool HighAstromancerSolarianCastFearWardOnMainTankAction::Execute(Event event)
 {
-    if (bot->getClass() != CLASS_PRIEST)
-        return false;
-
     Player* mainTank = nullptr;
     if (Group* group = bot->GetGroup())
     {
