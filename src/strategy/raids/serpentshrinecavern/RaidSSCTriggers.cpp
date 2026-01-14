@@ -10,9 +10,9 @@
 using namespace SerpentShrineCavernHelpers;
 
 // General
-bool SerpentShrineCavernTimerBotIsNotInCombatTrigger::IsActive()
+bool SerpentShrineCavernBotIsNotInCombatTrigger::IsActive()
 {
-    return IsInstanceTimerManager(botAI, bot) && !bot->IsInCombat();
+    return !bot->IsInCombat();
 }
 
 // Trash Mobs
@@ -614,10 +614,28 @@ bool LadyVashjTaintedCoreIsUnusableTrigger::IsActive()
         return true;
     }
 
-    if (IsLadyVashjInPhase3(botAI))
-        return true;
+    if (!IsLadyVashjInPhase2(botAI))
+        return bot->HasItemCount(ITEM_TAINTED_CORE, 1, false);
 
     return false;
+}
+
+bool LadyVashjNeedToResetCorePassingTrackersTrigger::IsActive()
+{
+    Unit* vashj = AI_VALUE2(Unit*, "find target", "lady vashj");
+    if (!vashj || IsLadyVashjInPhase2(botAI))
+        return false;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    return IsInstanceTimerManager(botAI, bot) ||
+           GetDesignatedCoreLooter(group, botAI) == bot ||
+           GetFirstTaintedCorePasser(group, botAI) == bot ||
+           GetSecondTaintedCorePasser(group, botAI) == bot ||
+           GetThirdTaintedCorePasser(group, botAI) == bot ||
+           GetFourthTaintedCorePasser(group, botAI) == bot;
 }
 
 bool LadyVashjToxicSporebatsAreSpewingPoisonCloudsTrigger::IsActive()
@@ -644,10 +662,4 @@ bool LadyVashjBotIsEntangledInToxicSporesOrStaticChargeTrigger::IsActive()
     }
 
     return false;
-}
-
-bool LadyVashjNeedToManageTrackersTrigger::IsActive()
-{
-    Unit* vashj = AI_VALUE2(Unit*, "find target", "lady vashj");
-    return vashj && vashj->GetHealthPct() > 99.8f;
 }
