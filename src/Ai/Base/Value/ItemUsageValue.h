@@ -13,7 +13,12 @@
 #include "SharedDefines.h"
 #include "Value.h"
 
-enum RollVote : uint8;
+// Shared UTF-8 lowercase helper used by item/loot logic.
+std::string ToLowerUtf8(std::string const& s);
+
+class Item;
+class Player;
+class PlayerbotAI;
 
 // Shared loot/spec helpers used by ItemUsageValue and loot-roll logic
 struct SpecTraits
@@ -59,6 +64,56 @@ struct ItemStatProfile
 };
 ItemStatProfile BuildItemStatProfile(ItemTemplate const* proto);
 
+// Shared helper: infer profession SkillLine for a recipe item.
+// Uses RequiredSkill when available, otherwise falls back to SubClass/name heuristics.
+uint32 GetRecipeSkill(ItemTemplate const* proto);
+
+// Shared loot/spec helpers used by ItemUsageValue and loot-roll logic
+struct SpecTraits
+{
+    uint8 cls = 0;
+    std::string spec;
+    bool isCaster = false;   // caster-stat profile
+    bool isHealer = false;
+    bool isTank = false;
+    bool isPhysical = false; // physical-stat profile
+    bool isDKTank = false;
+    bool isWarProt = false;
+    bool isEnhSham = false;
+    bool isFeralTk = false;
+    bool isFeralDps = false;
+    bool isHunter = false;
+    bool isRogue = false;
+    bool isWarrior = false;
+    bool isRetPal = false;
+    bool isProtPal = false;
+};
+
+// Small aggregate of commonly used stat flags for loot/spec rules.
+struct ItemStatProfile
+{
+    bool hasINT = false;
+    bool hasSPI = false;
+    bool hasMP5 = false;
+    bool hasSP = false;
+    bool hasSTR = false;
+    bool hasAGI = false;
+    bool hasSTA = false;
+    bool hasAP = false;
+    bool hasARP = false;
+    bool hasEXP = false;
+    bool hasHIT = false;
+    bool hasHASTE = false;
+    bool hasCRIT = false;
+    bool hasDef = false;
+    bool hasAvoid = false;
+    bool hasBlockValue = false;
+};
+
+// Constructors for the value objects above.
+SpecTraits GetSpecTraits(Player* bot);
+ItemStatProfile BuildItemStatProfile(ItemTemplate const* proto);
+
 enum ItemUsage : uint32
 {
     ITEM_USAGE_NONE = 0,
@@ -85,6 +140,8 @@ public:
     }
 
     ItemUsage Calculate() override;
+    static std::string BuildItemUsageParam(uint32 itemId, int32 randomPropertyId);
+
     static std::string BuildItemUsageParam(uint32 itemId, int32 randomPropertyId);
 
 private:
