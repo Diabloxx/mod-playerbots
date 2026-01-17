@@ -13,30 +13,17 @@
 #include "SharedDefines.h"
 #include "Value.h"
 
-// Shared UTF-8 lowercase helper used by item/loot logic.
-std::string ToLowerUtf8(std::string const& s);
-
-class Item;
-class Group;
-class Player;
-class PlayerbotAI;
-
-struct ItemTemplate;
 enum RollVote : uint8;
-
-// Shared helper: infer profession SkillLine for a recipe item.
-// Uses RequiredSkill when available, otherwise falls back to SubClass/name heuristics.
-uint32 GetRecipeSkill(ItemTemplate const* proto);
 
 // Shared loot/spec helpers used by ItemUsageValue and loot-roll logic
 struct SpecTraits
 {
     uint8 cls = 0;
     std::string spec;
-    bool isCaster = false;   // caster-stat profile
+    bool isCaster = false;  // caster-stat profile
     bool isHealer = false;
     bool isTank = false;
-    bool isPhysical = false; // physical-stat profile
+    bool isPhysical = false;  // physical-stat profile
     bool isDKTank = false;
     bool isWarProt = false;
     bool isEnhSham = false;
@@ -48,6 +35,7 @@ struct SpecTraits
     bool isRetPal = false;
     bool isProtPal = false;
 };
+SpecTraits GetSpecTraits(Player* bot);
 
 // Small aggregate of commonly used stat flags for loot/spec rules.
 struct ItemStatProfile
@@ -69,9 +57,6 @@ struct ItemStatProfile
     bool hasAvoid = false;
     bool hasBlockValue = false;
 };
-
-// Constructors for the value objects above.
-SpecTraits GetSpecTraits(Player* bot);
 ItemStatProfile BuildItemStatProfile(ItemTemplate const* proto);
 
 enum ItemUsage : uint32
@@ -100,7 +85,6 @@ public:
     }
 
     ItemUsage Calculate() override;
-
     static std::string BuildItemUsageParam(uint32 itemId, int32 randomPropertyId);
 
 private:
@@ -118,10 +102,7 @@ private:
 public:
     static std::vector<uint32> SpellsUsingItem(uint32 itemId, Player* bot);
     static bool SpellGivesSkillUp(uint32 spellId, Player* bot);
-
-    // Shared helper: classify classic lockboxes (used by loot-roll logic).
-    static bool IsLockboxItem(ItemTemplate const* proto);
-
+    static bool IsLockboxItem(ItemTemplate const* proto);  // Shared helper: classify classic lockboxes
     static std::string const GetConsumableType(ItemTemplate const* proto, bool hasMana);
 };
 
