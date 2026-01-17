@@ -10,16 +10,19 @@
 #include <vector>
 
 #include "NamedObjectContext.h"
+#include "SharedDefines.h"
 #include "Value.h"
 
 // Shared UTF-8 lowercase helper used by item/loot logic.
 std::string ToLowerUtf8(std::string const& s);
 
 class Item;
+class Group;
 class Player;
 class PlayerbotAI;
 
 struct ItemTemplate;
+enum RollVote : uint8;
 
 // Shared helper: infer profession SkillLine for a recipe item.
 // Uses RequiredSkill when available, otherwise falls back to SubClass/name heuristics.
@@ -122,6 +125,7 @@ public:
     static std::string const GetConsumableType(ItemTemplate const* proto, bool hasMana);
 };
 
+
 class LootUsageValue : public ItemUsageValue
 {
 public:
@@ -129,5 +133,10 @@ public:
 
     ItemUsage Calculate() override;
 };
+
+// Loot roll helpers (used by LootRollAction)
+char const* RollVoteText(RollVote v);
+RollVote CalculateLootRollVote(Player* bot, ItemTemplate const* proto, int32 randomProperty, ItemUsage usage,
+                               Group* group, char const* logTag);
 
 #endif
