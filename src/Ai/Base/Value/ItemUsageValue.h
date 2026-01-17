@@ -17,6 +17,7 @@
 std::string ToLowerUtf8(std::string const& s);
 
 class Item;
+class Group;
 class Player;
 class PlayerbotAI;
 
@@ -162,6 +163,7 @@ public:
     static bool IsLockboxItem(ItemTemplate const* proto);  // Shared helper: classify classic lockboxes
     static std::string const GetConsumableType(ItemTemplate const* proto, bool hasMana);
 };
+
 
 class LootUsageValue : public ItemUsageValue
 {
