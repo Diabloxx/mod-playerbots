@@ -164,7 +164,6 @@ public:
     static std::string const GetConsumableType(ItemTemplate const* proto, bool hasMana);
 };
 
-
 class LootUsageValue : public ItemUsageValue
 {
 public:
