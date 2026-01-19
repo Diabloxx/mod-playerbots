@@ -44,7 +44,7 @@
 #include "Scenario/RaidAi/GruulsLair/RaidGruulsLairActionContext.h"
 #include "Scenario/RaidAi/GruulsLair/RaidGruulsLairTriggerContext.h"
 #include "Scenario/RaidAi/Naxxramas/RaidNaxxActionContext.h"
-#include "Scenario/RaidAi/naxxramas/RaidNaxxTriggerContext.h"
+#include "Scenario/RaidAi/Naxxramas/RaidNaxxTriggerContext.h"
 #include "Scenario/RaidAi/EyeOfEternity/RaidEoEActionContext.h"
 #include "Scenario/RaidAi/EyeOfEternity/RaidEoETriggerContext.h"
 #include "Scenario/RaidAi/VaultOfArchavon/RaidVoAActionContext.h"
