@@ -43,6 +43,8 @@
 #include "Ai/Raid/Magtheridon/RaidMagtheridonTriggerContext.h"
 #include "Ai/Raid/GruulsLair/RaidGruulsLairActionContext.h"
 #include "Ai/Raid/GruulsLair/RaidGruulsLairTriggerContext.h"
+#include "Ai/Raid/Naxxramas/RaidNaxxActionContext.h"
+#include "Ai/Raid/Naxxramas/RaidNaxxTriggerContext.h"
 #include "Ai/Raid/EyeOfEternity/RaidEoEActionContext.h"
 #include "Ai/Raid/EyeOfEternity/RaidEoETriggerContext.h"
 #include "Ai/Raid/VaultOfArchavon/RaidVoAActionContext.h"
