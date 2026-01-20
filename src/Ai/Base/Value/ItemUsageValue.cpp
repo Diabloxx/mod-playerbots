@@ -664,6 +664,7 @@ static bool IsFallbackNeedReasonableForSpec(Player* bot, ItemTemplate const* pro
     const bool isPurePhysical = hasPhysical && !hasCaster && !hasTank;
     const bool isPureTank = hasTank && !hasCaster && !hasPhysical;
     const bool isStrengthOnly = stats.hasSTR && !stats.hasAGI;
+    const bool isAgilityPreferred = traits.isHunter || traits.isRogue || traits.isEnhSham;
 
     if (isPureCaster)
         return traits.isCaster;
@@ -695,7 +696,7 @@ static bool IsFallbackNeedReasonableForSpec(Player* bot, ItemTemplate const* pro
     if (traits.isRogue && stats.hasSTR)
         return false;
 
-    if (isStrengthOnly && !isStrengthUser())
+    if (isStrengthOnly && (!isStrengthUser() || isAgilityPreferred))
         return false;
 
     if (traits.isHunter && isStrengthOnly)
@@ -899,6 +900,9 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
 
     if (proto->Class == ITEM_CLASS_WEAPON)
     {
+        if ((traits.isHunter || traits.isRogue || traits.isEnhSham) && stats.hasSTR)
+            return false;
+
         if (traits.isTank && hasCaster)
             return false;
 
@@ -929,7 +933,7 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
     if ((traits.isHunter || traits.isEnhSham) && stats.hasSTR)
         return false;
 
-    if (traits.isRogue && stats.hasSTR)
+    if ((traits.isHunter || traits.isRogue || traits.isEnhSham) && stats.hasSTR)
         return false;
 
     if (IsJewelryOrCloak(proto))
