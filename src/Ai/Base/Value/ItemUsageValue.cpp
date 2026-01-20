@@ -684,13 +684,7 @@ static bool IsFallbackNeedReasonableForSpec(Player* bot, ItemTemplate const* pro
         return false;
 
     if (traits.isHealer && stats.hasHIT)
-        return false;
-
-    if (traits.cls == CLASS_DEATH_KNIGHT && stats.hasAGI)
-        return false;
-
-    if ((traits.isHunter || traits.isEnhSham) && stats.hasSTR)
-        return false;
+         return false;
 
     if (traits.cls == CLASS_DEATH_KNIGHT && stats.hasAGI)
         return false;

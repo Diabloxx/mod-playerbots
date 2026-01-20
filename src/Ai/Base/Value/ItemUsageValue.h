@@ -21,49 +21,8 @@ class Group;
 class Player;
 class PlayerbotAI;
 
-// Shared loot/spec helpers used by ItemUsageValue and loot-roll logic
-struct SpecTraits
-{
-    uint8 cls = 0;
-    std::string spec;
-    bool isCaster = false;  // caster-stat profile
-    bool isHealer = false;
-    bool isTank = false;
-    bool isPhysical = false;  // physical-stat profile
-    bool isDKTank = false;
-    bool isWarProt = false;
-    bool isEnhSham = false;
-    bool isFeralTk = false;
-    bool isFeralDps = false;
-    bool isHunter = false;
-    bool isRogue = false;
-    bool isWarrior = false;
-    bool isRetPal = false;
-    bool isProtPal = false;
-};
-SpecTraits GetSpecTraits(Player* bot);
-
-// Small aggregate of commonly used stat flags for loot/spec rules.
-struct ItemStatProfile
-{
-    bool hasINT = false;
-    bool hasSPI = false;
-    bool hasMP5 = false;
-    bool hasSP = false;
-    bool hasSTR = false;
-    bool hasAGI = false;
-    bool hasSTA = false;
-    bool hasAP = false;
-    bool hasARP = false;
-    bool hasEXP = false;
-    bool hasHIT = false;
-    bool hasHASTE = false;
-    bool hasCRIT = false;
-    bool hasDef = false;
-    bool hasAvoid = false;
-    bool hasBlockValue = false;
-};
-ItemStatProfile BuildItemStatProfile(ItemTemplate const* proto);
+struct ItemTemplate;
+enum RollVote : uint8;
 
 // Shared helper: infer profession SkillLine for a recipe item.
 // Uses RequiredSkill when available, otherwise falls back to SubClass/name heuristics.
@@ -141,6 +100,7 @@ public:
     }
 
     ItemUsage Calculate() override;
+
     static std::string BuildItemUsageParam(uint32 itemId, int32 randomPropertyId);
 
 private:
@@ -158,7 +118,10 @@ private:
 public:
     static std::vector<uint32> SpellsUsingItem(uint32 itemId, Player* bot);
     static bool SpellGivesSkillUp(uint32 spellId, Player* bot);
-    static bool IsLockboxItem(ItemTemplate const* proto);  // Shared helper: classify classic lockboxes
+
+    // Shared helper: classify classic lockboxes (used by loot-roll logic).
+    static bool IsLockboxItem(ItemTemplate const* proto);
+
     static std::string const GetConsumableType(ItemTemplate const* proto, bool hasMana);
 };
 
