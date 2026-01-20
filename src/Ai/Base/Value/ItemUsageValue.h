@@ -143,8 +143,6 @@ public:
     ItemUsage Calculate() override;
     static std::string BuildItemUsageParam(uint32 itemId, int32 randomPropertyId);
 
-    static std::string BuildItemUsageParam(uint32 itemId, int32 randomPropertyId);
-
 private:
     ItemUsage QueryItemUsageForEquip(ItemTemplate const* proto, int32 randomPropertyId = 0);
     uint32 GetSmallestBagSize();
