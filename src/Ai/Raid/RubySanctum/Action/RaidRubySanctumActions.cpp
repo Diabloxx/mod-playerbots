@@ -129,6 +129,14 @@ bool RubySanctumZarithrianAddsAction::Execute(Event /*event*/)
     if (!target)
         return false;
 
+    // If fear just ended, clear lingering controlled movement to resume combat
+    if (!bot->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED) &&
+        bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE)
+    {
+        bot->GetMotionMaster()->Clear(true);
+        bot->StopMoving();
+    }
+
     // Main tank should hold the boss; let the other tank pick up adds
     Unit* boss = AI_VALUE2(Unit*, "find target", "zarithrian");
     if (botAI->IsTank(bot) && boss && boss->GetVictim() == bot)
@@ -167,10 +175,14 @@ bool RubySanctumHalionCombustionAction::Execute(Event /*event*/)
     // Return to a safe position: tanks front, others on flank to avoid breath/tail
     if (Unit* boss = AI_VALUE2(Unit*, "find target", "halion"))
     {
-        if (botAI->IsTank(bot))
-            Follow(boss, 6.0f, 0.0f);
-        else
-            Follow(boss, 8.0f, ANGLE_90_DEG);
+        float dist = bot->GetExactDist2d(boss);
+        if (dist > 35.0f)
+        {
+            if (botAI->IsTank(bot))
+                Follow(boss, 6.0f, 0.0f);
+            else
+                Follow(boss, 8.0f, ANGLE_90_DEG);
+        }
     }
 
     return moved;
@@ -184,10 +196,14 @@ bool RubySanctumHalionConsumptionAction::Execute(Event /*event*/)
     // Return to a safe position: tanks front, others on flank to avoid breath/tail
     if (Unit* boss = AI_VALUE2(Unit*, "find target", "halion"))
     {
-        if (botAI->IsTank(bot))
-            Follow(boss, 6.0f, 0.0f);
-        else
-            Follow(boss, 8.0f, ANGLE_90_DEG);
+        float dist = bot->GetExactDist2d(boss);
+        if (dist > 35.0f)
+        {
+            if (botAI->IsTank(bot))
+                Follow(boss, 6.0f, 0.0f);
+            else
+                Follow(boss, 8.0f, ANGLE_90_DEG);
+        }
     }
 
     return moved;
@@ -210,9 +226,14 @@ bool RubySanctumHalionMeteorStrikeAction::Execute(Event /*event*/)
     {
         bool moved = MoveAway(mark, 15.0f);
 
-        // Reposition to Halion's flank after dodging to avoid breath/tail
+        // Reposition to Halion's flank after dodging to avoid breath/tail and keep inside arena bounds
         if (Unit* boss = AI_VALUE2(Unit*, "find target", "halion"))
-            Follow(boss, 8.0f, ANGLE_90_DEG);
+        {
+            if (bot->GetExactDist2d(boss) > 35.0f)
+                Follow(boss, 8.0f, ANGLE_90_DEG);
+            else
+                Follow(boss, 8.0f, ANGLE_90_DEG);
+        }
 
         return moved;
     }
