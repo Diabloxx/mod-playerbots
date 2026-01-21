@@ -57,6 +57,8 @@
 #include "Ai/Raid/Onyxia/RaidOnyxiaTriggerContext.h"
 #include "Ai/Raid/Icecrown/RaidIccActionContext.h"
 #include "Ai/Raid/Icecrown/RaidIccTriggerContext.h"
+#include "Ai/Raid/RubySanctum/RaidRubySanctumActionContext.h"
+#include "Ai/Raid/RubySanctum/RaidRubySanctumTriggerContext.h"
 
 SharedNamedObjectContextList<Strategy> AiObjectContext::sharedStrategyContexts;
 SharedNamedObjectContextList<Action> AiObjectContext::sharedActionContexts;
@@ -127,6 +129,7 @@ void AiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Act
     actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidOnyxiaActionContext());
     actionContexts.Add(new RaidIccActionContext());
+    actionContexts.Add(new RaidRubySanctumActionContext());
     actionContexts.Add(new WotlkDungeonUKActionContext());
     actionContexts.Add(new WotlkDungeonNexActionContext());
     actionContexts.Add(new WotlkDungeonANActionContext());
@@ -163,6 +166,7 @@ void AiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Tr
     triggerContexts.Add(new RaidUlduarTriggerContext());
     triggerContexts.Add(new RaidOnyxiaTriggerContext());
     triggerContexts.Add(new RaidIccTriggerContext());
+    triggerContexts.Add(new RaidRubySanctumTriggerContext());
     triggerContexts.Add(new WotlkDungeonUKTriggerContext());
     triggerContexts.Add(new WotlkDungeonNexTriggerContext());
     triggerContexts.Add(new WotlkDungeonANTriggerContext());
