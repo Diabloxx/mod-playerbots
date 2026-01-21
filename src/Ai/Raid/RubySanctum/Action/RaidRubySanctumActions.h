@@ -4,10 +4,10 @@
 #include "AttackAction.h"
 
 // Baltharus
-class RubySanctumBaltharusBrandAction : public MovementAction
+class RubySanctumBaltharusBrandAction : public AttackAction
 {
 public:
-    explicit RubySanctumBaltharusBrandAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum baltharus brand") {}
+    explicit RubySanctumBaltharusBrandAction(PlayerbotAI* botAI) : AttackAction(botAI, "rubysanctum baltharus brand") {}
     bool Execute(Event event) override;
 };
 

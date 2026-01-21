@@ -20,9 +20,27 @@ namespace
 
 bool RubySanctumBaltharusBrandAction::Execute(Event /*event*/)
 {
-    // Move away from the group when branded
-    // Keep movement short to avoid climbing terrain; only need ~10yd separation
-    return MoveAway(bot, 10.0f);
+    // If brand faded, immediately re-engage the boss/clone
+    if (!bot->HasAura(SPELL_ENERVATING_BRAND))
+    {
+        Unit* target = AI_VALUE2(Unit*, "find target", "baltharus");
+        Unit* clone = AI_VALUE2(Unit*, "find target", "baltharus clone");
+        if (clone)
+            target = clone;  // Prefer the active clone if present
+
+        if (target)
+            return Attack(target);
+
+        return false;
+    }
+
+    // Brand active: spread out from allies to avoid stacking the debuff
+    // Use group-based separation instead of self to ensure we leave the clump
+    if (MoveFromGroup(15.0f))
+        return true;
+
+    // Fallback: step away from current position if group spread failed
+    return MoveAway(bot, 15.0f);
 }
 
 bool RubySanctumBaltharusSplitAddAction::Execute(Event /*event*/)
