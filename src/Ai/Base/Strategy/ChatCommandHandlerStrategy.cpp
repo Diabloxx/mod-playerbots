@@ -89,6 +89,10 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(
         new TriggerNode("bwl", { NextAction("bwl chat shortcut", relevance) }));
     triggers.push_back(
+        new TriggerNode("rubysanctum", { NextAction("rubysanctum chat shortcut", relevance) }));
+    triggers.push_back(
+        new TriggerNode("rs", { NextAction("rubysanctum chat shortcut", relevance) }));
+    triggers.push_back(
         new TriggerNode("dps", { NextAction("tell estimated dps", relevance) }));
     triggers.push_back(
         new TriggerNode("disperse", { NextAction("disperse set", relevance) }));
@@ -192,4 +196,6 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("glyph equip"); // Added for custom Glyphs
     supported.push_back("pet");
     supported.push_back("pet attack");
+    supported.push_back("rubysanctum");
+    supported.push_back("rs");
 }

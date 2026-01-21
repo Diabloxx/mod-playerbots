@@ -267,3 +267,16 @@ bool BwlChatShortcutAction::Execute(Event event)
     botAI->TellMasterNoFacing("Add Bwl Strategies!");
     return true;
 }
+
+bool RubySanctumChatShortcutAction::Execute(Event event)
+{
+    Player* master = GetMaster();
+    if (!master)
+        return false;
+
+    botAI->Reset();
+    botAI->ChangeStrategy("+rubysanctum", BOT_STATE_NON_COMBAT);
+    botAI->ChangeStrategy("+rubysanctum", BOT_STATE_COMBAT);
+    botAI->TellMasterNoFacing("Add Ruby Sanctum Strategies!");
+    return true;
+}

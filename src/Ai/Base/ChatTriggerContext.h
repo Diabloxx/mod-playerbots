@@ -128,6 +128,8 @@ public:
         creators["drink"] = &ChatTriggerContext::drink;
         // creators["naxx"] = &ChatTriggerContext::naxx;
         // creators["bwl"] = &ChatTriggerContext::bwl;
+        // creators["rubysanctum"] = &ChatTriggerContext::rubysanctum;
+        // creators["rs"] = &ChatTriggerContext::rubysanctum;
         creators["dps"] = &ChatTriggerContext::dps;
         creators["disperse"] = &ChatTriggerContext::disperse;
         creators["calc"] = &ChatTriggerContext::calc;
@@ -246,6 +248,7 @@ private:
     static Trigger* drink(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "drink"); }
     // static Trigger* naxx(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "naxx"); }
     // static Trigger* bwl(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "bwl"); }
+    // static Trigger* rubysanctum(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "rubysanctum"); }
     static Trigger* dps(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "dps"); }
     static Trigger* disperse(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "disperse"); }
     static Trigger* calc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "calc"); }
@@ -257,6 +260,7 @@ private:
     static Trigger* pet(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet"); }
     static Trigger* pet_attack(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet attack"); }
     static Trigger* roll_action(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "roll"); }
+
 };
 
 #endif

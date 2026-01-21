@@ -198,6 +198,7 @@ public:
         creators["pet"] = &ChatActionContext::pet;
         creators["pet attack"] = &ChatActionContext::pet_attack;
         creators["roll"] = &ChatActionContext::roll_action;
+        creators["rubysanctum chat shortcut"] = &ChatActionContext::rubysanctum_chat_shortcut;
     }
 
 private:

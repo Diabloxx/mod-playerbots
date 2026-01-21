@@ -98,4 +98,11 @@ public:
     BwlChatShortcutAction(PlayerbotAI* ai) : Action(ai, "bwl chat shortcut") {}
     virtual bool Execute(Event event);
 };
+
+class RubySanctumChatShortcutAction : public Action
+{
+public:
+    RubySanctumChatShortcutAction(PlayerbotAI* ai) : Action(ai, "rubysanctum chat shortcut") {}
+    virtual bool Execute(Event event);
+};
 #endif
