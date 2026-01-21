@@ -7,7 +7,7 @@ class RubySanctumBaltharusBrandTrigger : public Trigger
 {
 public:
     explicit RubySanctumBaltharusBrandTrigger(PlayerbotAI* botAI) : Trigger(botAI, "rubysanctum baltharus brand") {}
-    bool IsActive() override { return false; }
+    bool IsActive() override;
 };
 
 class RubySanctumBaltharusSplitAddTrigger : public Trigger

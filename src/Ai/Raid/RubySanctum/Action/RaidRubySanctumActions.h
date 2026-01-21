@@ -1,94 +1,94 @@
 #ifndef _PLAYERBOT_RAIDRUBYSANCTUMACTIONS_H
 #define _PLAYERBOT_RAIDRUBYSANCTUMACTIONS_H
 
-#include "Action.h"
+#include "AttackAction.h"
 
 // Baltharus
-class RubySanctumBaltharusBrandAction : public Action
+class RubySanctumBaltharusBrandAction : public MovementAction
 {
 public:
-    explicit RubySanctumBaltharusBrandAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum baltharus brand") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumBaltharusBrandAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum baltharus brand") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumBaltharusSplitAddAction : public Action
+class RubySanctumBaltharusSplitAddAction : public AttackAction
 {
 public:
-    explicit RubySanctumBaltharusSplitAddAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum baltharus split add") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumBaltharusSplitAddAction(PlayerbotAI* botAI) : AttackAction(botAI, "rubysanctum baltharus split add") {}
+    bool Execute(Event event) override;
 };
 
 // Saviana
-class RubySanctumSavianaEnrageAction : public Action
+class RubySanctumSavianaEnrageAction : public MovementAction
 {
 public:
-    explicit RubySanctumSavianaEnrageAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum saviana enrage dispel") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumSavianaEnrageAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum saviana enrage dispel") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumSavianaFlameBeaconAction : public Action
+class RubySanctumSavianaFlameBeaconAction : public MovementAction
 {
 public:
-    explicit RubySanctumSavianaFlameBeaconAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum saviana flame beacon") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumSavianaFlameBeaconAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum saviana flame beacon") {}
+    bool Execute(Event event) override;
 };
 
 // Zarithrian
-class RubySanctumZarithrianCleaveArmorSwapAction : public Action
+class RubySanctumZarithrianCleaveArmorSwapAction : public MovementAction
 {
 public:
-    explicit RubySanctumZarithrianCleaveArmorSwapAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum zarithrian cleave armor swap") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumZarithrianCleaveArmorSwapAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum zarithrian cleave armor swap") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumZarithrianAddsAction : public Action
+class RubySanctumZarithrianAddsAction : public AttackAction
 {
 public:
-    explicit RubySanctumZarithrianAddsAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum zarithrian adds") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumZarithrianAddsAction(PlayerbotAI* botAI) : AttackAction(botAI, "rubysanctum zarithrian adds") {}
+    bool Execute(Event event) override;
 };
 
 // Halion
-class RubySanctumHalionCombustionAction : public Action
+class RubySanctumHalionCombustionAction : public MovementAction
 {
 public:
-    explicit RubySanctumHalionCombustionAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum halion combustion") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumHalionCombustionAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum halion combustion") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumHalionConsumptionAction : public Action
+class RubySanctumHalionConsumptionAction : public MovementAction
 {
 public:
-    explicit RubySanctumHalionConsumptionAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum halion consumption") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumHalionConsumptionAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum halion consumption") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumHalionMeteorStrikeAction : public Action
+class RubySanctumHalionMeteorStrikeAction : public MovementAction
 {
 public:
-    explicit RubySanctumHalionMeteorStrikeAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum halion meteor") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumHalionMeteorStrikeAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum halion meteor") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumHalionInfernosAction : public Action
+class RubySanctumHalionInfernosAction : public AttackAction
 {
 public:
-    explicit RubySanctumHalionInfernosAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum halion infernos") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumHalionInfernosAction(PlayerbotAI* botAI) : AttackAction(botAI, "rubysanctum halion infernos") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumHalionTwilightCutterAction : public Action
+class RubySanctumHalionTwilightCutterAction : public MovementAction
 {
 public:
-    explicit RubySanctumHalionTwilightCutterAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum halion cutter move") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumHalionTwilightCutterAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum halion cutter move") {}
+    bool Execute(Event event) override;
 };
 
-class RubySanctumHalionCorporealityBalanceAction : public Action
+class RubySanctumHalionCorporealityBalanceAction : public MovementAction
 {
 public:
-    explicit RubySanctumHalionCorporealityBalanceAction(PlayerbotAI* botAI) : Action(botAI, "rubysanctum halion balance") {}
-    bool Execute(Event /*event*/) override { return true; }
+    explicit RubySanctumHalionCorporealityBalanceAction(PlayerbotAI* botAI) : MovementAction(botAI, "rubysanctum halion balance") {}
+    bool Execute(Event event) override;
 };
 
 #endif

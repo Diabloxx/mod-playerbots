@@ -1,6 +1,5 @@
 #include "RaidRubySanctumActions.h"
 #include "Playerbots.h"
-#include "ruby_sanctum.h"
 
 namespace
 {
@@ -9,6 +8,13 @@ namespace
     constexpr uint32 SPELL_FLAME_BEACON           = 74453;
     constexpr uint32 SPELL_FIERY_COMBUSTION       = 74562;
     constexpr uint32 SPELL_SOUL_CONSUMPTION       = 74792;
+
+    // Creatures reused in actions
+    constexpr uint32 NPC_BALTHARUS_CLONE          = 39899;
+    constexpr uint32 NPC_ONYX_FLAMECALLER         = 39814;
+    constexpr uint32 NPC_METEOR_STRIKE_MARK       = 40029;
+    constexpr uint32 NPC_LIVING_INFERNO           = 40681;
+    constexpr uint32 NPC_LIVING_EMBER             = 40683;
 }
 
 bool RubySanctumBaltharusBrandAction::Execute(Event /*event*/)
@@ -26,7 +32,7 @@ bool RubySanctumBaltharusSplitAddAction::Execute(Event /*event*/)
         for (ObjectGuid const& guid : npcs)
         {
             Unit* u = botAI->GetUnit(guid);
-            if (u && u->GetEntry() == NPC_BALTHARUS_THE_WARBORN_CLONE)
+            if (u && u->GetEntry() == NPC_BALTHARUS_CLONE)
             {
                 add = u;
                 break;
@@ -45,7 +51,11 @@ bool RubySanctumSavianaEnrageAction::Execute(Event /*event*/)
         return false;
 
     // Try a tranquilize/soothe style dispel
-    if (CastSpell("tranquilizing shot", boss) || CastSpell("soothe", boss) || CastSpell("anesthetic poison", boss))
+    if (botAI->DoSpecificAction("tranquilizing shot", Event("rubysanctum"), true))
+        return true;
+    if (botAI->DoSpecificAction("soothe", Event("rubysanctum"), true))
+        return true;
+    if (botAI->DoSpecificAction("anesthetic poison", Event("rubysanctum"), true))
         return true;
 
     return false;
@@ -64,9 +74,9 @@ bool RubySanctumZarithrianCleaveArmorSwapAction::Execute(Event /*event*/)
         return false;
 
     // Taunt swap
-    if (CastSpell("taunt", boss))
+    if (botAI->DoSpecificAction("taunt", Event("rubysanctum"), true))
         return true;
-    return CastSpell("growl", boss);
+    return botAI->DoSpecificAction("growl", Event("rubysanctum"), true);
 }
 
 bool RubySanctumZarithrianAddsAction::Execute(Event /*event*/)
