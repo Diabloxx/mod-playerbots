@@ -20,12 +20,14 @@ namespace
 bool RubySanctumBaltharusBrandAction::Execute(Event /*event*/)
 {
     // Move away from the group when branded
-    return MoveAway(bot, 12.0f);
+    // Keep movement short to avoid climbing terrain; only need ~10yd separation
+    return MoveAway(bot, 10.0f);
 }
 
 bool RubySanctumBaltharusSplitAddAction::Execute(Event /*event*/)
 {
     Unit* add = AI_VALUE2(Unit*, "find target", "baltharus clone");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "baltharus");
     if (!add)
     {
         GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -41,6 +43,19 @@ bool RubySanctumBaltharusSplitAddAction::Execute(Event /*event*/)
     }
     if (!add)
         return false;
+
+    // Keep tanks close to the pull spot; only nudge away from the main boss to avoid stacking
+    if (botAI->IsTank(bot))
+    {
+        if (boss)
+        {
+            float dist = bot->GetDistance(boss);
+            if (dist < 8.0f)
+                MoveAway(boss, 8.0f);
+        }
+        else
+            MoveFromGroup(8.0f);
+    }
     return Attack(add);
 }
 
