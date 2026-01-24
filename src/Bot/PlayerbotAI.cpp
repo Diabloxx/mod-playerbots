@@ -1634,6 +1634,7 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
             break;
         case 550:
             strategyName = "tempestkeep";  // Tempest Keep
+            break;
         case 724:
             strategyName = "rubysanctum";  // The Ruby Sanctum
             break;
