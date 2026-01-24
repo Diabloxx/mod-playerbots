@@ -1632,6 +1632,8 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 548:
             strategyName = "ssc";  // Serpentshrine Cavern
             break;
+        case 550:
+            strategyName = "tempestkeep";  // Tempest Keep
         case 724:
             strategyName = "rubysanctum";  // The Ruby Sanctum
             break;
