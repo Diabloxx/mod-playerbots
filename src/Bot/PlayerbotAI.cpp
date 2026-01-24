@@ -1635,9 +1635,6 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 550:
             strategyName = "tempestkeep";  // Tempest Keep
             break;
-        case 724:
-            strategyName = "rubysanctum";  // The Ruby Sanctum
-            break;
         case 565:
             strategyName = "gruulslair";  // Gruul's Lair
             break;
@@ -1703,6 +1700,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
             break;
         case 668:
             strategyName = "wotlk-hor";  // Halls of Reflection
+            break;
+        case 724:
+            strategyName = "rubysanctum";  // The Ruby Sanctum
             break;
         default:
             break;
