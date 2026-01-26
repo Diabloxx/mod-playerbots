@@ -1290,7 +1290,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         {
             if (shouldEquipInSlot || IsFallbackNeedReasonableForSpec(bot, itemProto))
                 return ITEM_USAGE_EQUIP;
-          
+
             return ITEM_USAGE_BAD_EQUIP;
         }
 
@@ -1355,7 +1355,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
                             return ITEM_USAGE_BROKEN_EQUIP;
                         if (shouldEquipInSlot)
                             return ITEM_USAGE_REPLACE;
-                        
+
                         return ITEM_USAGE_BAD_EQUIP;
                     }
                 default:
