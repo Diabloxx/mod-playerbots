@@ -59,24 +59,10 @@ namespace NaxxSpellIds
     static constexpr uint32 Icebolt10 = 28522;
     static constexpr uint32 Icebolt25 = 28526;
     static constexpr uint32 Chill25 = 55699;
-/*
-    // Fight
-    SPELL_FROST_AURA                = 28531,
-    SPELL_CLEAVE                    = 19983,
-    SPELL_TAIL_SWEEP                = 55697,
-    SPELL_SUMMON_BLIZZARD           = 28560,
-    SPELL_LIFE_DRAIN                = 28542,
-    SPELL_BERSERK                   = 26662,
+    static constexpr uint32 LifeDrain = 28542;
+    static constexpr uint32 FrostMissile = 30101;
+    static constexpr uint32 FrostExplosion = 28524;
 
-    // Ice block
-    SPELL_ICEBOLT_CAST              = 28526,
-    SPELL_ICEBOLT_TRIGGER           = 28522,
-    SPELL_FROST_MISSILE             = 30101,
-    SPELL_FROST_EXPLOSION           = 28524,
-
-    // Visuals
-    SPELL_SAPPHIRON_DIES            = 29357
-*/
     // Gluth
     static constexpr uint32 Decimate10 = 28374;
     static constexpr uint32 Decimate25 = 54426;

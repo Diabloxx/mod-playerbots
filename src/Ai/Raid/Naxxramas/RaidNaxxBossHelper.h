@@ -189,6 +189,7 @@ public:
             _last_land_ms = getMSTime();
         }
         _was_flying = now_flying;
+        UpdateIceboltState();
         return true;
     }
     bool IsPhaseGround() { return _unit && !_unit->IsFlying(); }
@@ -207,6 +208,27 @@ public:
         {
             return false;
         }
+        return HasIceboltInGroup();
+    }
+    bool IsBreathWindow()
+    {
+        if (!IsPhaseFlight())
+        {
+            return false;
+        }
+        if (IsBreathCasting())
+        {
+            return true;
+        }
+        if (!_last_icebolt_ms)
+        {
+            return false;
+        }
+        uint32 elapsed = getMSTime() - _last_icebolt_ms;
+        return elapsed >= BREATH_MIN_MS && elapsed <= BREATH_MAX_MS;
+    }
+    bool HasLifeDrainInGroup()
+    {
         Group* group = bot->GetGroup();
         if (!group)
         {
@@ -215,9 +237,11 @@ public:
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->GetSource();
-      if (member &&
-                (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::Icebolt10, NaxxSpellIds::Icebolt25}) ||
-                 botAI->HasAura("icebolt", member, false, false, -1, true)))
+            if (!member)
+            {
+                continue;
+            }
+            if (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::LifeDrain}) || botAI->HasAura("life drain", member))
             {
                 return true;
             }
@@ -294,12 +318,72 @@ private:
         _unit = nullptr;
         _was_flying = false;
         _last_land_ms = 0;
+        _last_icebolt_ms = 0;
     }
 
     const uint32 POSITION_TIME_AFTER_LANDED = 5000;
+    const uint32 BREATH_MIN_MS = 1000;
+    const uint32 BREATH_MAX_MS = 12000;
+    bool HasIceboltInGroup()
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return false;
+        }
+        bool hasIcebolt = false;
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member)
+            {
+                continue;
+            }
+            if (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::Icebolt10, NaxxSpellIds::Icebolt25}) ||
+                botAI->HasAura("icebolt", member, false, false, -1, true))
+            {
+                hasIcebolt = true;
+                break;
+            }
+        }
+        if (hasIcebolt)
+        {
+            _last_icebolt_ms = getMSTime();
+        }
+        return hasIcebolt;
+    }
+    void UpdateIceboltState()
+    {
+        if (!IsPhaseFlight())
+        {
+            _last_icebolt_ms = 0;
+            return;
+        }
+        HasIceboltInGroup();
+    }
+    bool IsBreathCasting()
+    {
+        if (!_unit || !_unit->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return false;
+        }
+        Spell* spell = _unit->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (!spell)
+        {
+            spell = _unit->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+        }
+        if (!spell)
+        {
+            return false;
+        }
+        SpellInfo const* info = spell->GetSpellInfo();
+        return NaxxSpellIds::MatchesAnySpellId(info, {NaxxSpellIds::FrostMissile, NaxxSpellIds::FrostExplosion});
+    }
+
     Unit* _unit = nullptr;
     bool _was_flying = false;
     uint32 _last_land_ms = 0;
+    uint32 _last_icebolt_ms = 0;
 };
 
 class GluthBossHelper : public AiObject

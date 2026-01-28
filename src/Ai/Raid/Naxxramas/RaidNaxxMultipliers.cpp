@@ -188,6 +188,46 @@ float SapphironGenericMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
+    if (botAI->IsHeal(bot))
+    {
+        if (helper.IsBreathWindow())
+        {
+            if (dynamic_cast<SapphironFlightPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+        if (helper.WaitForExplosion())
+        {
+            if (dynamic_cast<SapphironFlightPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+        if (helper.HasLifeDrainInGroup())
+        {
+            if (dynamic_cast<SapphironGroundPositionAction*>(action) ||
+                dynamic_cast<SapphironFlightPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+    }
     if (dynamic_cast<CastDeathGripAction*>(action) || dynamic_cast<CombatFormationMoveAction*>(action))
     {
         return 0.0f;
