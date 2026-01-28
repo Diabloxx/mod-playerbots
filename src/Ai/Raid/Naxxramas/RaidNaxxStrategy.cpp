@@ -137,7 +137,7 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             NextAction("loatheb choose target", ACTION_RAID + 1)
         })
     );
-	
+
     // Noth the Plaguebringer
     triggers.push_back(
         new TriggerNode("noth",
