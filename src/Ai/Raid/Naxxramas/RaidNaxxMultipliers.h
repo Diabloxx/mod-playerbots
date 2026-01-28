@@ -4,6 +4,7 @@
 
 #include "Multiplier.h"
 #include "RaidNaxxBossHelper.h"
+#include "GenericSpellActions.h"
 
 class GrobbulusMultiplier : public Multiplier
 {
@@ -111,6 +112,16 @@ public:
 
 private:
     GluthBossHelper helper;
+};
+
+class NothGenericMultiplier : public Multiplier
+{
+public:
+    NothGenericMultiplier(PlayerbotAI* ai) : Multiplier(ai, "noth generic"), helper(ai) {}
+    float GetValue(Action* action) override;
+
+private:
+    NothBossHelper helper;
 };
 
 #endif

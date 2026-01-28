@@ -20,6 +20,11 @@ namespace NaxxSpellIds
     // Grobbulus
     static constexpr uint32 PoisonCloud = 28240;
 
+    // Noth the Plaguebringer
+    static constexpr uint32 CurseOfThePlaguebringer = 29213;
+    static constexpr uint32 Cripple = 29212;
+    static constexpr uint32 Blink = 29208;
+
     // Thaddius polarity
     static constexpr uint32 PositiveCharge10 = 28059;
     static constexpr uint32 PositiveCharge25 = 28062;

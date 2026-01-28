@@ -255,6 +255,8 @@ bool PatchwerkNonTankTrigger::IsActive()
 
 bool LoathebTrigger::IsActive() { return helper.UpdateBossAI(); }
 
+bool NothTrigger::IsActive() { return helper.UpdateBossAI(); }
+
 bool ThaddiusPhasePetTrigger::IsActive()
 {
     if (!helper.UpdateBossAI())
