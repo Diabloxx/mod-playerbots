@@ -545,10 +545,10 @@ public:
         Difficulty diff = bot->GetRaidDifficulty();
         if (diff == RAID_DIFFICULTY_25MAN_NORMAL)
         {
-            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0) ||
-                   botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2);
+            return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0) ||
+                   botAI->IsAssistHealOfIndex(bot, 1) || botAI->IsAssistHealOfIndex(bot, 2);
         }
-        return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0);
+        return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0);
     }
     void CalculatePosToGo(Player* bot)
     {
@@ -563,7 +563,7 @@ public:
             uint32 elapsed_ms = _combat_start_ms ? getMSTime() - _combat_start_ms : 0;
             // Interval: 24s - 15s - 15s - ...
             posToGo = !(elapsed_ms <= 9000 || ((elapsed_ms - 9000) / 67500) % 2 == 0);
-            if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) || (raid25 && botAI->IsHealAssistantOfIndex(bot, 1)))
+            if (botAI->IsAssistRangedDpsOfIndex(bot, 0) || (raid25 && botAI->IsAssistHealOfIndex(bot, 1)))
             {
                 posToGo = 1 - posToGo;
             }
