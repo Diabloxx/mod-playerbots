@@ -63,6 +63,11 @@ namespace NaxxSpellIds
     static constexpr uint32 FrostMissile = 30101;
     static constexpr uint32 FrostExplosion = 28524;
 
+    // Kel'Thuzad
+    static constexpr uint32 FrostBlast = 27808;
+    static constexpr uint32 DetonateMana = 27819;
+    static constexpr uint32 ChainsOfKelthuzad = 28410;
+
     // Gluth
     static constexpr uint32 Decimate10 = 28374;
     static constexpr uint32 Decimate25 = 54426;

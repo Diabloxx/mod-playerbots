@@ -108,6 +108,61 @@ public:
     }
     bool IsPhaseOne() { return _unit && _unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE); }
     bool IsPhaseTwo() { return _unit && !_unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE); }
+    Player* GetPlayerWithAura(uint32 spellId)
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return nullptr;
+        }
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member || !member->IsAlive())
+            {
+                continue;
+            }
+            if (botAI->HasAura(spellId, member))
+            {
+                return member;
+            }
+        }
+        return nullptr;
+    }
+    bool HasAuraInGroup(uint32 spellId) { return GetPlayerWithAura(spellId) != nullptr; }
+    bool HasDetonateMana(Player* player)
+    {
+        if (!player)
+        {
+            return false;
+        }
+        return botAI->HasAura(NaxxSpellIds::DetonateMana, player);
+    }
+    bool HasChains(Player* player)
+    {
+        if (!player)
+        {
+            return false;
+        }
+        return botAI->HasAura(NaxxSpellIds::ChainsOfKelthuzad, player);
+    }
+    Unit* GetGuardian()
+    {
+        GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
+        for (auto i = attackers.begin(); i != attackers.end(); ++i)
+        {
+            Unit* unit = botAI->GetUnit(*i);
+            if (!unit)
+            {
+                continue;
+            }
+            if (botAI->EqualLowercaseName(unit->GetName(), "guardian of icecrown"))
+            {
+                return unit;
+            }
+        }
+        return nullptr;
+    }
     Unit* GetAnyShadowFissure()
     {
         Unit* shadow_fissure = nullptr;

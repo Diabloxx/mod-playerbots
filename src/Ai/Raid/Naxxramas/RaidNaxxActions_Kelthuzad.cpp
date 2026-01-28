@@ -1,5 +1,7 @@
 #include "RaidNaxxActions.h"
 
+#include <algorithm>
+
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
@@ -83,14 +85,7 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
     std::vector<Unit*> targets;
     if (botAI->IsRanged(bot))
     {
-        if (botAI->GetRangedDpsIndex(bot) <= 1)
-        {
-            targets = {target_soldier, target_weaver, target_abomination, target_kelthuzad};
-        }
-        else
-        {
-            targets = {target_weaver, target_soldier, target_abomination, target_kelthuzad};
-        }
+        targets = {target_weaver, target_soldier, target_abomination, target_kelthuzad};
     }
     else if (botAI->IsAssistTank(bot))
     {
@@ -102,6 +97,13 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
     }
     for (Unit* t : targets)
     {
+        if (!botAI->IsRanged(bot))
+        {
+            if (t && t->GetDistance2d(helper.center.first, helper.center.second) > 20.0f)
+            {
+                continue;
+            }
+        }
         if (t)
         {
             target = t;
@@ -127,6 +129,21 @@ bool KelthuzadPositionAction::Execute(Event event)
     }
     if (helper.IsPhaseOne())
     {
+        if (bot->GetDistance2d(helper.center.first, helper.center.second) > 20.0f)
+        {
+            return MoveInside(NAXX_MAP_ID, helper.center.first, helper.center.second, bot->GetPositionZ(), 3.0f,
+                              MovementPriority::MOVEMENT_COMBAT);
+        }
+        if (!botAI->IsRanged(bot))
+        {
+            Unit* currentTarget = AI_VALUE(Unit*, "current target");
+            if (currentTarget &&
+                currentTarget->GetDistance2d(helper.center.first, helper.center.second) <= 20.0f &&
+                bot->GetDistance2d(currentTarget) > 3.0f)
+            {
+                return MoveNear(currentTarget, 3.0f, MovementPriority::MOVEMENT_COMBAT);
+            }
+        }
         if (AI_VALUE(Unit*, "current target") == nullptr)
         {
             return MoveInside(NAXX_MAP_ID, helper.center.first, helper.center.second, bot->GetPositionZ(), 3.0f,
@@ -135,6 +152,29 @@ bool KelthuzadPositionAction::Execute(Event event)
     }
     else if (helper.IsPhaseTwo())
     {
+        if (helper.HasDetonateMana(bot))
+        {
+            float angle = helper.center.first == bot->GetPositionX() && helper.center.second == bot->GetPositionY()
+                              ? 0.0f
+                              : bot->GetAngle(helper.center.first, helper.center.second) + M_PI;
+            float spreadDistance = std::max(35.0f, bot->GetDistance2d(helper.center.first, helper.center.second) + 10.0f);
+            float dx = helper.center.first + cos(angle) * spreadDistance;
+            float dy = helper.center.second + sin(angle) * spreadDistance;
+            return MoveTo(NAXX_MAP_ID, dx, dy, bot->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+        }
+        if (helper.HasChains(bot))
+        {
+            bot->AttackStop();
+            return false;
+        }
+        Player* frostBlastTarget = helper.GetPlayerWithAura(NaxxSpellIds::FrostBlast);
+        if (frostBlastTarget && frostBlastTarget != bot && bot->GetDistance2d(frostBlastTarget) <= 8.0f)
+        {
+            float angle = frostBlastTarget->GetAngle(bot);
+            float dx = frostBlastTarget->GetPositionX() + cos(angle) * 8.0f;
+            float dy = frostBlastTarget->GetPositionY() + sin(angle) * 8.0f;
+            return MoveTo(NAXX_MAP_ID, dx, dy, bot->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+        }
         Unit* shadow_fissure = helper.GetAnyShadowFissure();
         if (!shadow_fissure || !bot->IsWithinDistInMap(shadow_fissure, 10.0f))
         {
@@ -167,10 +207,20 @@ bool KelthuzadPositionAction::Execute(Event event)
                 float dx, dy;
                 dx = helper.center.first + cos(angle) * distance;
                 dy = helper.center.second + sin(angle) * distance;
+                if (bot->GetDistance2d(dx, dy) <= 2.0f)
+                {
+                    return false;
+                }
                 return MoveTo(NAXX_MAP_ID, dx, dy, bot->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
             }
             else if (botAI->IsTank(bot))
             {
+                Unit* guardian = helper.GetGuardian();
+                if (guardian && botAI->IsAssistTank(bot))
+                {
+                    return MoveTo(NAXX_MAP_ID, helper.assist_tank_pos.first, helper.assist_tank_pos.second, bot->GetPositionZ(),
+                                  false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+                }
                 Unit* cur_tar = AI_VALUE(Unit*, "current target");
                 if (cur_tar && cur_tar->GetVictim() && cur_tar->GetVictim()->ToPlayer() &&
                     botAI->EqualLowercaseName(cur_tar->GetName(), "guardian of icecrown") &&
