@@ -19,15 +19,27 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 
-// Encode "random enchant" parameter for CalculateRollVote / ItemUsage.
-// >0 => randomPropertyId, <0 => randomSuffixId, 0 => none
-static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 randomSuffix)
+// Encodes the "random enchant" component of an item into a single int32.
+//
+// WotLK loot can specify a random enchant as either:
+//  - a RandomPropertyId (from ItemRandomProperties.dbc), or
+//  - a RandomSuffixId   (from ItemRandomSuffix.dbc).
+//
+// We store both in one signed integer:
+//  - > 0 : RandomPropertyId
+//  - < 0 : RandomSuffixId (stored as negative)
+//  - = 0 : no random enchant
+//
+// This convention is relied upon by downstream code, notably:
+//  - StatsWeightCalculator::CalculateRandomProperty(), which interprets
+//    negative values as suffix IDs and looks them up via LookupEntry(-id).
+static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 randomSuffixId)
 {
     if (randomPropertyId)
         return static_cast<int32>(randomPropertyId);
 
-    if (randomSuffix)
-        return -static_cast<int32>(randomSuffix);
+    if (randomSuffixId)
+        return -static_cast<int32>(randomSuffixId);
 
     return 0;
 }
@@ -57,25 +69,14 @@ bool LootRollAction::Execute(Event event)
         if (!proto)
             continue;
 
-        LOG_DEBUG("playerbots",
-                  "[LootRollDBG] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
-                  bot->GetName(), itemId, proto->Name1, proto->Class, proto->Quality, (int)group->GetLootMethod(),
-                  bot->HasSkill(SKILL_ENCHANTING), randomProperty);
-
         std::string const itemUsageParam = ItemUsageValue::BuildItemUsageParam(itemId, randomProperty);
         ItemUsage usage = AI_VALUE2(ItemUsage, "loot usage", itemUsageParam);
 
-        LOG_DEBUG("playerbots", "[LootRollDBG] usage={} (EQUIP=1 REPLACE=2 BAD_EQUIP=8 DISENCHANT=9)", (int)usage);
-        RollVote vote = CalculateLootRollVote(bot, proto, randomProperty, usage, group, "[LootRollDBG]");
+        RollVote vote = CalculateLootRollVote(bot, proto, randomProperty, usage, group);
         // Announce + send the roll vote (if ML/FFA => PASS)
         RollVote sent = vote;
         if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
             sent = PASS;
-
-        LOG_DEBUG("playerbots", "[LootPaternDBG] send vote={} (lootMethod={} Lvl={}) -> guid={} itemId={}",
-                  RollVoteText(sent), (int)group->GetLootMethod(), sPlayerbotAIConfig->lootRollLevel,
-                  guid.ToString(),
-                  itemId);
 
         group->CountRollVote(bot->GetGUID(), guid, sent);
         // One item at a time
@@ -119,11 +120,6 @@ bool MasterLootRollAction::Execute(Event event)
     if (!group)
         return false;
 
-    LOG_DEBUG("playerbots",
-              "[LootEnchantDBG][ML] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
-              bot->GetName(), itemId, proto->Name1, proto->Class, proto->Quality, (int)group->GetLootMethod(),
-              bot->HasSkill(SKILL_ENCHANTING), randomPropertyId);
-
     // Compute random property and usage, same pattern as LootRollAction::Execute
     int32 randomProperty = EncodeRandomEnchantParam(randomPropertyId, randomSuffix);
 
@@ -131,15 +127,11 @@ bool MasterLootRollAction::Execute(Event event)
     ItemUsage usage = AI_VALUE2(ItemUsage, "loot usage", itemUsageParam);
 
     // 1) Token heuristic: ONLY NEED if the target slot is a likely upgrade
-    RollVote vote = CalculateLootRollVote(bot, proto, randomProperty, usage, group, "[LootEnchantDBG][ML]");
+    RollVote vote = CalculateLootRollVote(bot, proto, randomProperty, usage, group);
 
     RollVote sent = vote;
     if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
         sent = PASS;
-
-    LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] vote={} -> sent={} lootMethod={} enchSkill={} deOK={}",
-              RollVoteText(vote), RollVoteText(sent), (int)group->GetLootMethod(),
-              bot->HasSkill(SKILL_ENCHANTING), usage == ITEM_USAGE_DISENCHANT ? 1 : 0);
 
     group->CountRollVote(bot->GetGUID(), creatureGuid, sent);
 
@@ -174,5 +166,6 @@ bool RollAction::Execute(Event event)
             if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE)
                 bot->DoRandomRoll(0, 100);
     }
+
     return true;
 }
