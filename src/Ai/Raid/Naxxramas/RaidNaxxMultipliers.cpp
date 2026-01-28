@@ -188,6 +188,46 @@ float SapphironGenericMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
+    if (botAI->IsHeal(bot))
+    {
+        if (helper.IsBreathWindow())
+        {
+            if (dynamic_cast<SapphironFlightPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+        if (helper.WaitForExplosion())
+        {
+            if (dynamic_cast<SapphironFlightPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+        if (helper.HasLifeDrainInGroup())
+        {
+            if (dynamic_cast<SapphironGroundPositionAction*>(action) ||
+                dynamic_cast<SapphironFlightPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+    }
     if (dynamic_cast<CastDeathGripAction*>(action) || dynamic_cast<CombatFormationMoveAction*>(action))
     {
         return 0.0f;
@@ -218,6 +258,49 @@ float KelthuzadGenericMultiplier::GetValue(Action* action)
     {
         return 1.0f;
     }
+    if (helper.HasChains(bot))
+    {
+        if (dynamic_cast<MovementAction*>(action))
+        {
+            return 1.0f;
+        }
+        return 0.0f;
+    }
+    if (botAI->IsHeal(bot))
+    {
+        if (helper.HasAuraInGroup(NaxxSpellIds::FrostBlast))
+        {
+            if (dynamic_cast<KelthuzadPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+        if (helper.HasAuraInGroup(NaxxSpellIds::ChainsOfKelthuzad))
+        {
+            if (dynamic_cast<KelthuzadPositionAction*>(action) ||
+                dynamic_cast<CastHealingSpellAction*>(action) ||
+                dynamic_cast<HealPartyMemberAction*>(action) ||
+                dynamic_cast<CastAoeHealSpellAction*>(action) ||
+                dynamic_cast<CurePartyMemberAction*>(action))
+            {
+                return 1.0f;
+            }
+            return 0.0f;
+        }
+    }
+    if (helper.HasDetonateMana(bot))
+    {
+        if (dynamic_cast<KelthuzadPositionAction*>(action) || dynamic_cast<MovementAction*>(action))
+        {
+            return 1.0f;
+        }
+        return 0.0f;
+    }
     if ((dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
          dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) || dynamic_cast<FleeAction*>(action)))
     {
@@ -239,6 +322,41 @@ float KelthuzadGenericMultiplier::GetValue(Action* action)
         {
             return 0.0f;
         }
+    }
+    return 1.0f;
+}
+
+float NothGenericMultiplier::GetValue(Action* action)
+{
+    if (!helper.UpdateBossAI())
+    {
+        return 1.0f;
+    }
+    if (helper.HasCurseInGroup() && (bot->getClass() == CLASS_DRUID || bot->getClass() == CLASS_SHAMAN ||
+                                    bot->getClass() == CLASS_MAGE))
+    {
+        if (dynamic_cast<CurePartyMemberAction*>(action))
+        {
+            return 2.0f;
+        }
+        if (dynamic_cast<CastHealingSpellAction*>(action))
+        {
+            return 1.0f;
+        }
+        return 0.0f;
+    }
+    if (!helper.IsBlinkWindow() || botAI->IsTank(bot))
+    {
+        return 1.0f;
+    }
+    if (dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
+        dynamic_cast<CastDebuffSpellOnAttackerAction*>(action))
+    {
+        return 0.0f;
+    }
+    if (dynamic_cast<CastSpellAction*>(action) && !dynamic_cast<CastHealingSpellAction*>(action))
+    {
+        return 0.0f;
     }
     return 1.0f;
 }

@@ -20,6 +20,11 @@ namespace NaxxSpellIds
     // Grobbulus
     static constexpr uint32 PoisonCloud = 28240;
 
+    // Noth the Plaguebringer
+    static constexpr uint32 CurseOfThePlaguebringer = 29213;
+    static constexpr uint32 Cripple = 29212;
+    static constexpr uint32 Blink = 29208;
+
     // Thaddius polarity
     static constexpr uint32 PositiveCharge10 = 28059;
     static constexpr uint32 PositiveCharge25 = 28062;
@@ -59,24 +64,15 @@ namespace NaxxSpellIds
     static constexpr uint32 Icebolt10 = 28522;
     static constexpr uint32 Icebolt25 = 28526;
     static constexpr uint32 Chill25 = 55699;
-/*
-    // Fight
-    SPELL_FROST_AURA                = 28531,
-    SPELL_CLEAVE                    = 19983,
-    SPELL_TAIL_SWEEP                = 55697,
-    SPELL_SUMMON_BLIZZARD           = 28560,
-    SPELL_LIFE_DRAIN                = 28542,
-    SPELL_BERSERK                   = 26662,
+    static constexpr uint32 LifeDrain = 28542;
+    static constexpr uint32 FrostMissile = 30101;
+    static constexpr uint32 FrostExplosion = 28524;
 
-    // Ice block
-    SPELL_ICEBOLT_CAST              = 28526,
-    SPELL_ICEBOLT_TRIGGER           = 28522,
-    SPELL_FROST_MISSILE             = 30101,
-    SPELL_FROST_EXPLOSION           = 28524,
+    // Kel'Thuzad
+    static constexpr uint32 FrostBlast = 27808;
+    static constexpr uint32 DetonateMana = 27819;
+    static constexpr uint32 ChainsOfKelthuzad = 28410;
 
-    // Visuals
-    SPELL_SAPPHIRON_DIES            = 29357
-*/
     // Gluth
     static constexpr uint32 Decimate10 = 28374;
     static constexpr uint32 Decimate25 = 54426;

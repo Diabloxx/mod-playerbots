@@ -255,4 +255,14 @@ private:
     LoathebBossHelper helper;
 };
 
+class NothTrigger : public Trigger
+{
+public:
+    NothTrigger(PlayerbotAI* ai) : Trigger(ai, "noth"), helper(ai) {}
+    bool IsActive() override;
+
+private:
+    NothBossHelper helper;
+};
+
 #endif

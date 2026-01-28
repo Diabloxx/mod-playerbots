@@ -108,6 +108,61 @@ public:
     }
     bool IsPhaseOne() { return _unit && _unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE); }
     bool IsPhaseTwo() { return _unit && !_unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE); }
+    Player* GetPlayerWithAura(uint32 spellId)
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return nullptr;
+        }
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member || !member->IsAlive())
+            {
+                continue;
+            }
+            if (botAI->HasAura(spellId, member))
+            {
+                return member;
+            }
+        }
+        return nullptr;
+    }
+    bool HasAuraInGroup(uint32 spellId) { return GetPlayerWithAura(spellId) != nullptr; }
+    bool HasDetonateMana(Player* player)
+    {
+        if (!player)
+        {
+            return false;
+        }
+        return botAI->HasAura(NaxxSpellIds::DetonateMana, player);
+    }
+    bool HasChains(Player* player)
+    {
+        if (!player)
+        {
+            return false;
+        }
+        return botAI->HasAura(NaxxSpellIds::ChainsOfKelthuzad, player);
+    }
+    Unit* GetGuardian()
+    {
+        GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
+        for (auto i = attackers.begin(); i != attackers.end(); ++i)
+        {
+            Unit* unit = botAI->GetUnit(*i);
+            if (!unit)
+            {
+                continue;
+            }
+            if (botAI->EqualLowercaseName(unit->GetName(), "guardian of icecrown"))
+            {
+                return unit;
+            }
+        }
+        return nullptr;
+    }
     Unit* GetAnyShadowFissure()
     {
         Unit* shadow_fissure = nullptr;
@@ -189,6 +244,7 @@ public:
             _last_land_ms = getMSTime();
         }
         _was_flying = now_flying;
+        UpdateIceboltState();
         return true;
     }
     bool IsPhaseGround() { return _unit && !_unit->IsFlying(); }
@@ -207,6 +263,27 @@ public:
         {
             return false;
         }
+        return HasIceboltInGroup();
+    }
+    bool IsBreathWindow()
+    {
+        if (!IsPhaseFlight())
+        {
+            return false;
+        }
+        if (IsBreathCasting())
+        {
+            return true;
+        }
+        if (!_last_icebolt_ms)
+        {
+            return false;
+        }
+        uint32 elapsed = getMSTime() - _last_icebolt_ms;
+        return elapsed >= BREATH_MIN_MS && elapsed <= BREATH_MAX_MS;
+    }
+    bool HasLifeDrainInGroup()
+    {
         Group* group = bot->GetGroup();
         if (!group)
         {
@@ -215,9 +292,11 @@ public:
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->GetSource();
-      if (member &&
-                (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::Icebolt10, NaxxSpellIds::Icebolt25}) ||
-                 botAI->HasAura("icebolt", member, false, false, -1, true)))
+            if (!member)
+            {
+                continue;
+            }
+            if (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::LifeDrain}) || botAI->HasAura("life drain", member))
             {
                 return true;
             }
@@ -294,12 +373,72 @@ private:
         _unit = nullptr;
         _was_flying = false;
         _last_land_ms = 0;
+        _last_icebolt_ms = 0;
     }
 
     const uint32 POSITION_TIME_AFTER_LANDED = 5000;
+    const uint32 BREATH_MIN_MS = 1000;
+    const uint32 BREATH_MAX_MS = 12000;
+    bool HasIceboltInGroup()
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return false;
+        }
+        bool hasIcebolt = false;
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member)
+            {
+                continue;
+            }
+            if (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::Icebolt10, NaxxSpellIds::Icebolt25}) ||
+                botAI->HasAura("icebolt", member, false, false, -1, true))
+            {
+                hasIcebolt = true;
+                break;
+            }
+        }
+        if (hasIcebolt)
+        {
+            _last_icebolt_ms = getMSTime();
+        }
+        return hasIcebolt;
+    }
+    void UpdateIceboltState()
+    {
+        if (!IsPhaseFlight())
+        {
+            _last_icebolt_ms = 0;
+            return;
+        }
+        HasIceboltInGroup();
+    }
+    bool IsBreathCasting()
+    {
+        if (!_unit || !_unit->HasUnitState(UNIT_STATE_CASTING))
+        {
+            return false;
+        }
+        Spell* spell = _unit->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (!spell)
+        {
+            spell = _unit->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+        }
+        if (!spell)
+        {
+            return false;
+        }
+        SpellInfo const* info = spell->GetSpellInfo();
+        return NaxxSpellIds::MatchesAnySpellId(info, {NaxxSpellIds::FrostMissile, NaxxSpellIds::FrostExplosion});
+    }
+
     Unit* _unit = nullptr;
     bool _was_flying = false;
     uint32 _last_land_ms = 0;
+    uint32 _last_icebolt_ms = 0;
 };
 
 class GluthBossHelper : public AiObject
@@ -417,6 +556,85 @@ private:
     Unit* _unit = nullptr;
 };
 
+class NothBossHelper : public AiObject
+{
+public:
+    const std::pair<float, float> center = {2684.94f, -3502.53f};
+    NothBossHelper(PlayerbotAI* botAI) : AiObject(botAI) {}
+    bool UpdateBossAI()
+    {
+        if (!bot->IsInCombat())
+        {
+            Reset();
+        }
+        if (_unit && (!_unit->IsInWorld() || !_unit->IsAlive()))
+        {
+            Reset();
+        }
+        if (!_unit)
+        {
+            _unit = AI_VALUE2(Unit*, "find target", "noth the plaguebringer");
+        }
+        if (!_unit)
+        {
+            return false;
+        }
+        if (_unit->HasUnitState(UNIT_STATE_CASTING))
+        {
+            Spell* spell = _unit->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+            if (!spell)
+            {
+                spell = _unit->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+            }
+            if (spell)
+            {
+                SpellInfo const* info = spell->GetSpellInfo();
+                bool isBlink = NaxxSpellIds::MatchesAnySpellId(info, {NaxxSpellIds::Blink});
+                if (!isBlink && info && info->SpellName[LOCALE_enUS])
+                {
+                    // Fallback to name for custom spell data.
+                    isBlink = botAI->EqualLowercaseName(info->SpellName[LOCALE_enUS], "blink");
+                }
+                if (isBlink)
+                {
+                    _last_blink_ms = getMSTime();
+                }
+            }
+        }
+        return true;
+    }
+    bool IsBalconyPhase() const { return _unit && _unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE); }
+    bool IsBlinkWindow() const { return _last_blink_ms != 0 && getMSTime() - _last_blink_ms < 3000; }
+    bool HasCurseInGroup() const
+    {
+        GuidVector members = AI_VALUE(GuidVector, "group members");
+        for (ObjectGuid const& guid : members)
+        {
+            Unit* member = botAI->GetUnit(guid);
+            if (!member)
+            {
+                continue;
+            }
+            if (NaxxSpellIds::HasAnyAura(botAI, member, {NaxxSpellIds::CurseOfThePlaguebringer}) ||
+                botAI->HasAura("curse of the plaguebringer", member))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+private:
+    void Reset()
+    {
+        _unit = nullptr;
+        _last_blink_ms = 0;
+    }
+
+    Unit* _unit = nullptr;
+    uint32 _last_blink_ms = 0;
+};
+
 class FourhorsemanBossHelper : public AiObject
 {
 public:
@@ -461,10 +679,10 @@ public:
         Difficulty diff = bot->GetRaidDifficulty();
         if (diff == RAID_DIFFICULTY_25MAN_NORMAL)
         {
-            return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0) ||
-                   botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2);
+            return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0) ||
+                   botAI->IsAssistHealOfIndex(bot, 1) || botAI->IsAssistHealOfIndex(bot, 2);
         }
-        return botAI->IsRangedDpsAssistantOfIndex(bot, 0) || botAI->IsHealAssistantOfIndex(bot, 0);
+        return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0);
     }
     void CalculatePosToGo(Player* bot)
     {
@@ -479,7 +697,7 @@ public:
             uint32 elapsed_ms = _combat_start_ms ? getMSTime() - _combat_start_ms : 0;
             // Interval: 24s - 15s - 15s - ...
             posToGo = !(elapsed_ms <= 9000 || ((elapsed_ms - 9000) / 67500) % 2 == 0);
-            if (botAI->IsRangedDpsAssistantOfIndex(bot, 0) || (raid25 && botAI->IsHealAssistantOfIndex(bot, 1)))
+            if (botAI->IsAssistRangedDpsOfIndex(bot, 0) || (raid25 && botAI->IsAssistHealOfIndex(bot, 1)))
             {
                 posToGo = 1 - posToGo;
             }

@@ -138,6 +138,14 @@ void RaidNaxxStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         })
     );
 
+    // Noth the Plaguebringer
+    triggers.push_back(
+        new TriggerNode("noth",
+        {
+            NextAction("noth position", ACTION_RAID + 1),
+            NextAction("noth choose target", ACTION_RAID + 1)
+        })
+    );
 }
 
 void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
@@ -153,4 +161,5 @@ void RaidNaxxStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new FourhorsemanGenericMultiplier(botAI));
     // multipliers.push_back(new GothikGenericMultiplier(botAI));
     multipliers.push_back(new GluthGenericMultiplier(botAI));
+    multipliers.push_back(new NothGenericMultiplier(botAI));
 }
