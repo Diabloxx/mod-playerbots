@@ -85,7 +85,14 @@ bool KelthuzadChooseTargetAction::Execute(Event event)
     std::vector<Unit*> targets;
     if (botAI->IsRanged(bot))
     {
-        targets = {target_weaver, target_soldier, target_abomination, target_kelthuzad};
+        if (helper.IsPhaseTwo())
+        {
+            targets = {target_kelthuzad, target_weaver, target_soldier, target_abomination};
+        }
+        else
+        {
+            targets = {target_weaver, target_soldier, target_abomination, target_kelthuzad};
+        }
     }
     else if (botAI->IsAssistTank(bot))
     {
