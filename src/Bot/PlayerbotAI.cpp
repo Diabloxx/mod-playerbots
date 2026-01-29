@@ -1926,6 +1926,11 @@ bool PlayerbotAI::IsAssistHealOfIndex(Player* player, int index, bool ignoreDead
     return false;
 }
 
+bool PlayerbotAI::IsHealAssistantOfIndex(Player* player, int index, bool ignoreDeadPlayers)
+{
+    return IsAssistHealOfIndex(player, index, ignoreDeadPlayers);
+}
+
 bool PlayerbotAI::IsAssistRangedDpsOfIndex(Player* player, int index, bool ignoreDeadPlayers)
 {
     Group* group = player->GetGroup();
@@ -1971,6 +1976,11 @@ bool PlayerbotAI::IsAssistRangedDpsOfIndex(Player* player, int index, bool ignor
     }
 
     return false;
+}
+
+bool PlayerbotAI::IsRangedDpsAssistantOfIndex(Player* player, int index, bool ignoreDeadPlayers)
+{
+    return IsAssistRangedDpsOfIndex(player, index, ignoreDeadPlayers);
 }
 
 bool PlayerbotAI::HasAggro(Unit* unit)

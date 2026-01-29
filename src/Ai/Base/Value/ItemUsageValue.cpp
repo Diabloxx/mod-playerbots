@@ -17,16 +17,16 @@
 #include "GuildTaskMgr.h"
 #include "Item.h"
 #include "ItemTemplate.h"
+#include "LootAction.h"
 #include "LootObjectStack.h"
 #include "LootRollAction.h"
-#include "SpellAuraDefines.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
-#include "LootAction.h"
+#include "SpellAuraDefines.h"
 #include "StatsWeightCalculator.h"
 #include "Util.h"
 #include "World.h"
@@ -55,7 +55,7 @@ ParsedItemUsage ParseItemUsageQualifier(std::string const& qualifier)
 
     return parsed;
 }
-} // namespace
+}  // namespace
 
 // Lowercase helper for item names using core UTF-8 utilities.
 std::string ToLowerUtf8(std::string const& s)
@@ -88,85 +88,7 @@ uint32 GetRecipeSkill(ItemTemplate const* proto)
     // Fallback heuristic on SubClass (books used by professions).
     switch (proto->SubClass)
     {
-        case ITEM_SUBCLASS_BOOK: // e.g. Book of Glyph Mastery
-        {
-            // If the name hints glyphs, assume Inscription.
-            std::string const lowered = ToLowerUtf8(proto->Name1);
-            if (lowered.find("glyph") != std::string::npos)
-                return SKILL_INSCRIPTION;
-            break;
-        }
-        case ITEM_SUBCLASS_LEATHERWORKING_PATTERN:
-            return SKILL_LEATHERWORKING;
-        case ITEM_SUBCLASS_TAILORING_PATTERN:
-            return SKILL_TAILORING;
-        case ITEM_SUBCLASS_ENGINEERING_SCHEMATIC:
-            return SKILL_ENGINEERING;
-        case ITEM_SUBCLASS_BLACKSMITHING:
-            return SKILL_BLACKSMITHING;
-        case ITEM_SUBCLASS_COOKING_RECIPE:
-            return SKILL_COOKING;
-        case ITEM_SUBCLASS_ALCHEMY_RECIPE:
-            return SKILL_ALCHEMY;
-        case ITEM_SUBCLASS_FIRST_AID_MANUAL:
-            return SKILL_FIRST_AID;
-        case ITEM_SUBCLASS_ENCHANTING_FORMULA:
-            return SKILL_ENCHANTING;
-        case ITEM_SUBCLASS_FISHING_MANUAL:
-            return SKILL_FISHING;
-        case ITEM_SUBCLASS_JEWELCRAFTING_RECIPE:
-            return SKILL_JEWELCRAFTING;
-        default:
-            break;
-    }
-
-    return 0;
-}
-
-namespace
-{
-struct ParsedItemUsage
-{
-    ParsedItemUsage parsed = ParseItemUsageQualifier(qualifier);
-    uint32 itemId = parsed.itemId;
-    uint32 randomPropertyId = parsed.randomPropertyId;
-
-    return parsed;
-}
-} // namespace
-
-// Lowercase helper for item names using core UTF-8 utilities.
-std::string ToLowerUtf8(std::string const& s)
-{
-    if (s.empty())
-        return s;
-
-    std::wstring w;
-    if (!Utf8toWStr(s, w))
-        return s;
-
-    wstrToLower(w);
-
-    std::string lowered;
-    if (!WStrToUtf8(w, lowered))
-        return s;
-
-    return lowered;
-}
-
-uint32 GetRecipeSkill(ItemTemplate const* proto)
-{
-    if (!proto)
-        return 0;
-
-    // Primary path: DB usually sets RequiredSkill on recipe items.
-    if (proto->RequiredSkill)
-        return proto->RequiredSkill;
-
-    // Fallback heuristic on SubClass (books used by professions).
-    switch (proto->SubClass)
-    {
-        case ITEM_SUBCLASS_BOOK: // e.g. Book of Glyph Mastery
+        case ITEM_SUBCLASS_BOOK:  // e.g. Book of Glyph Mastery
         {
             // If the name hints glyphs, assume Inscription.
             std::string const lowered = ToLowerUtf8(proto->Name1);
@@ -287,20 +209,17 @@ ItemUsage ItemUsageValue::Calculate()
     bool isSoulbound = item && item->IsSoulBound();
 
     // Enchanting fallback: only consider disenchant when the item has no direct equipment usage.
-    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
-        botAI->HasSkill(SKILL_ENCHANTING) &&
+    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && botAI->HasSkill(SKILL_ENCHANTING) &&
         proto->Quality >= ITEM_QUALITY_UNCOMMON)
     {
         uint32 enchantingSkill = bot->GetSkillValue(SKILL_ENCHANTING);
 
         // Only allow disenchant if the bot has the required skill.
-        bool canDisenchant = (proto->RequiredDisenchantSkill == 0 ||
-                              enchantingSkill >= proto->RequiredDisenchantSkill);
+        bool canDisenchant = (proto->RequiredDisenchantSkill == 0 || enchantingSkill >= proto->RequiredDisenchantSkill);
 
         // BoP, or BoE that is already soulbound: safe to treat as DE-only usage.
         if (canDisenchant &&
-            (proto->Bonding == BIND_WHEN_PICKED_UP ||
-             (proto->Bonding == BIND_WHEN_EQUIPPED && isSoulbound)))
+            (proto->Bonding == BIND_WHEN_PICKED_UP || (proto->Bonding == BIND_WHEN_EQUIPPED && isSoulbound)))
         {
             return ITEM_USAGE_DISENCHANT;
         }
@@ -309,7 +228,8 @@ ItemUsage ItemUsageValue::Calculate()
     Player* master = botAI->GetMaster();
     bool isSelfBot = (master == bot);
     bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
-    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
+    bool masterNeedsItemForQuest =
+        master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
 
     // Identify the source of loot
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
@@ -363,7 +283,7 @@ ItemUsage ItemUsageValue::Calculate()
             if (proto->SubClass == requiredSubClass)
             {
                 float ammoCount = BetterStacks(proto, "ammo");
-                float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2; // Hunters get 8 stacks, others 2
+                float requiredAmmo = (bot->getClass() == CLASS_HUNTER) ? 8 : 2;  // Hunters get 8 stacks, others 2
                 uint32 currentAmmoId = bot->GetUInt32Value(PLAYER_AMMO_ID);
 
                 // Check if the bot has an ammo type assigned
@@ -375,14 +295,15 @@ ItemUsage ItemUsageValue::Calculate()
                 ItemTemplate const* currentAmmoProto = sObjectMgr->GetItemTemplate(currentAmmoId);
                 if (currentAmmoProto)
                 {
-                    uint32 currentAmmoDPS = (currentAmmoProto->Damage[0].DamageMin + currentAmmoProto->Damage[0].DamageMax) * 1000 / 2;
+                    uint32 currentAmmoDPS =
+                        (currentAmmoProto->Damage[0].DamageMin + currentAmmoProto->Damage[0].DamageMax) * 1000 / 2;
                     uint32 newAmmoDPS = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2;
 
-                    if (newAmmoDPS > currentAmmoDPS) // New ammo meets upgrade condition
+                    if (newAmmoDPS > currentAmmoDPS)  // New ammo meets upgrade condition
                     {
                         return ITEM_USAGE_EQUIP;
                     }
-                    if (newAmmoDPS < currentAmmoDPS) // New ammo is worse
+                    if (newAmmoDPS < currentAmmoDPS)  // New ammo is worse
                     {
                         return ITEM_USAGE_NONE;
                     }
@@ -427,10 +348,7 @@ std::string ItemUsageValue::BuildItemUsageParam(uint32 itemId, int32 randomPrope
 
 namespace
 {
-static bool EnableGroupUsageChecks()
-{
-    return sPlayerbotAIConfig->rollUseGroupUsageChecks;
-}
+static bool EnableGroupUsageChecks() { return sPlayerbotAIConfig->rollUseGroupUsageChecks; }
 
 static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto);
 
@@ -453,8 +371,8 @@ static bool HasAnyStat(ItemTemplate const* proto, std::initializer_list<ItemModT
 
 static bool HasAnyTankAvoidance(ItemTemplate const* proto)
 {
-    return HasAnyStat(proto, {ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING,
-                              ITEM_MOD_BLOCK_RATING});
+    return HasAnyStat(
+        proto, {ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING});
 }
 
 static bool IsRelicForClass(ItemTemplate const* proto, uint8 cls)
@@ -574,22 +492,23 @@ static bool IsStrictCrossArmorContext(Player* bot)
 
 namespace
 {
-    static bool GroupMemberWouldEquipArmor(Player* member, PlayerbotAI* memberAI, ItemTemplate const* proto, std::string const& param)
-    {
-        if (!member || !memberAI || !proto)
-            return false;
+static bool GroupMemberWouldEquipArmor(Player* member, PlayerbotAI* memberAI, ItemTemplate const* proto,
+                                       std::string const& param)
+{
+    if (!member || !memberAI || !proto)
+        return false;
 
-        if (IsLowerTierArmorForBot(member, proto))
-            return false;
+    if (IsLowerTierArmorForBot(member, proto))
+        return false;
 
-        AiObjectContext* ctx = memberAI->GetAiObjectContext();
-        if (!ctx)
-            return false;
+    AiObjectContext* ctx = memberAI->GetAiObjectContext();
+    if (!ctx)
+        return false;
 
-        ItemUsage const otherUsage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
-        return otherUsage == ITEM_USAGE_EQUIP || otherUsage == ITEM_USAGE_REPLACE;
-    }
-} // namespace
+    ItemUsage const otherUsage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
+    return otherUsage == ITEM_USAGE_EQUIP || otherUsage == ITEM_USAGE_REPLACE;
+}
+}  // namespace
 
 static bool GroupHasPrimaryArmorUserLikelyToNeed(Player* self, ItemTemplate const* proto, int32 randomProperty)
 {
@@ -602,9 +521,7 @@ static bool GroupHasPrimaryArmorUserLikelyToNeed(Player* self, ItemTemplate cons
     std::string const param = ItemUsageValue::BuildItemUsageParam(proto->ItemId, randomProperty);
 
     return ForEachBotGroupMember(self, [&](Player* member, PlayerbotAI* memberAI) -> bool
-    {
-        return GroupMemberWouldEquipArmor(member, memberAI, proto, param);
-    });
+                                 { return GroupMemberWouldEquipArmor(member, memberAI, proto, param); });
 }
 
 static bool GroupHasDesperateUpgradeUser(Player* self, ItemTemplate const* proto, int32 randomProperty)
@@ -618,40 +535,40 @@ static bool GroupHasDesperateUpgradeUser(Player* self, ItemTemplate const* proto
     std::string const param = ItemUsageValue::BuildItemUsageParam(proto->ItemId, randomProperty);
 
     return ForEachBotGroupMember(self,
-        [&](Player* member, PlayerbotAI* memberAI) -> bool
-        {
-            AiObjectContext* ctx = memberAI->GetAiObjectContext();
-            if (!ctx)
-                return false;
+                                 [&](Player* member, PlayerbotAI* memberAI) -> bool
+                                 {
+                                     AiObjectContext* ctx = memberAI->GetAiObjectContext();
+                                     if (!ctx)
+                                         return false;
 
-            ItemUsage usage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
-            if (usage != ITEM_USAGE_EQUIP && usage != ITEM_USAGE_REPLACE)
-                return false;
+                                     ItemUsage usage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
+                                     if (usage != ITEM_USAGE_EQUIP && usage != ITEM_USAGE_REPLACE)
+                                         return false;
 
-            ItemTemplate const* bestProto = nullptr;
-            for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
-            {
-                Item* oldItem = member->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-                if (!oldItem)
-                    continue;
+                                     ItemTemplate const* bestProto = nullptr;
+                                     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+                                     {
+                                         Item* oldItem = member->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+                                         if (!oldItem)
+                                             continue;
 
-                ItemTemplate const* oldProto = oldItem->GetTemplate();
-                if (!oldProto)
-                    continue;
+                                         ItemTemplate const* oldProto = oldItem->GetTemplate();
+                                         if (!oldProto)
+                                             continue;
 
-                if (oldProto->Class != ITEM_CLASS_ARMOR)
-                    continue;
+                                         if (oldProto->Class != ITEM_CLASS_ARMOR)
+                                             continue;
 
-                if (oldProto->InventoryType != proto->InventoryType)
-                    continue;
+                                         if (oldProto->InventoryType != proto->InventoryType)
+                                             continue;
 
-                if (!bestProto || oldProto->ItemLevel > bestProto->ItemLevel)
-                    bestProto = oldProto;
-            }
+                                         if (!bestProto || oldProto->ItemLevel > bestProto->ItemLevel)
+                                             bestProto = oldProto;
+                                     }
 
-            bool hasVeryBadItem = !bestProto || bestProto->Quality <= ITEM_QUALITY_NORMAL;
-            return hasVeryBadItem;
-        });
+                                     bool hasVeryBadItem = !bestProto || bestProto->Quality <= ITEM_QUALITY_NORMAL;
+                                     return hasVeryBadItem;
+                                 });
 }
 
 static bool IsDesperateJewelryUpgradeForBot(Player* bot, ItemTemplate const* proto, int32 randomProperty)
@@ -729,21 +646,21 @@ static bool GroupHasPrimarySpecUpgradeCandidate(Player* self, ItemTemplate const
     std::string const param = ItemUsageValue::BuildItemUsageParam(proto->ItemId, randomProperty);
 
     return ForEachBotGroupMember(self,
-        [&](Player* member, PlayerbotAI* memberAI) -> bool
-        {
-            AiObjectContext* ctx = memberAI->GetAiObjectContext();
-            if (!ctx)
-                return false;
+                                 [&](Player* member, PlayerbotAI* memberAI) -> bool
+                                 {
+                                     AiObjectContext* ctx = memberAI->GetAiObjectContext();
+                                     if (!ctx)
+                                         return false;
 
-            ItemUsage otherUsage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
-            if (otherUsage != ITEM_USAGE_EQUIP && otherUsage != ITEM_USAGE_REPLACE)
-                return false;
+                                     ItemUsage otherUsage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
+                                     if (otherUsage != ITEM_USAGE_EQUIP && otherUsage != ITEM_USAGE_REPLACE)
+                                         return false;
 
-            if (!IsPrimaryForSpec(member, proto))
-                return false;
+                                     if (!IsPrimaryForSpec(member, proto))
+                                         return false;
 
-            return true;
-        });
+                                     return true;
+                                 });
 }
 
 static bool IsFallbackNeedReasonableForSpec(Player* bot, ItemTemplate const* proto)
@@ -758,8 +675,9 @@ static bool IsFallbackNeedReasonableForSpec(Player* bot, ItemTemplate const* pro
 
     ItemStatProfile const stats = BuildItemStatProfile(proto);
     bool const hasAnyStat = stats.hasINT || stats.hasSPI || stats.hasMP5 || stats.hasSP || stats.hasSTR ||
-        stats.hasAGI || stats.hasSTA || stats.hasAP || stats.hasARP || stats.hasEXP || stats.hasHIT ||
-        stats.hasHASTE || stats.hasCRIT || stats.hasDef || stats.hasAvoid || stats.hasBlockValue;
+                            stats.hasAGI || stats.hasSTA || stats.hasAP || stats.hasARP || stats.hasEXP ||
+                            stats.hasHIT || stats.hasHASTE || stats.hasCRIT || stats.hasDef || stats.hasAvoid ||
+                            stats.hasBlockValue;
 
     if (!hasAnyStat)
         return true;
@@ -796,7 +714,7 @@ static bool IsFallbackNeedReasonableForSpec(Player* bot, ItemTemplate const* pro
 
     return false;
 }
-} // namespace
+}  // namespace
 
 SpecTraits GetSpecTraits(Player* bot)
 {
@@ -841,139 +759,139 @@ SpecTraits GetSpecTraits(Player* bot)
 
 namespace
 {
-    static void UpdateItemStatProfileFromStats(ItemTemplate const* proto, ItemStatProfile& s)
+static void UpdateItemStatProfileFromStats(ItemTemplate const* proto, ItemStatProfile& s)
+{
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
     {
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+        if (proto->ItemStat[i].ItemStatValue == 0)
+            continue;
+
+        switch (proto->ItemStat[i].ItemStatType)
         {
-            if (proto->ItemStat[i].ItemStatValue == 0)
-                continue;
-
-            switch (proto->ItemStat[i].ItemStatType)
-            {
-                case ITEM_MOD_INTELLECT:
-                    s.hasINT = true;
-                    break;
-                case ITEM_MOD_SPIRIT:
-                    s.hasSPI = true;
-                    break;
-                case ITEM_MOD_SPELL_POWER:
-                    s.hasSP = true;
-                    break;
-                case ITEM_MOD_SPELL_HEALING_DONE:
-                    s.hasSP = true;
-                    break;
-                case ITEM_MOD_HIT_RATING:
-                    s.hasHIT = true;
-                    break;
-                case ITEM_MOD_CRIT_RATING:
-                    s.hasCRIT = true;
-                    break;
-                case ITEM_MOD_HASTE_RATING:
-                    s.hasHASTE = true;
-                    break;
-                case ITEM_MOD_MANA_REGENERATION:
-                    s.hasMP5 = true;
-                    break;
-                case ITEM_MOD_STRENGTH:
-                    s.hasSTR = true;
-                    break;
-                case ITEM_MOD_AGILITY:
-                    s.hasAGI = true;
-                    break;
-                case ITEM_MOD_ATTACK_POWER:
-                    s.hasAP = true;
-                    break;
-                case ITEM_MOD_ARMOR_PENETRATION_RATING:
-                    s.hasARP = true;
-                    break;
-                case ITEM_MOD_DEFENSE_SKILL_RATING:
-                    s.hasDef = true;
-                    break;
-                case ITEM_MOD_DODGE_RATING:
-                case ITEM_MOD_PARRY_RATING:
-                case ITEM_MOD_BLOCK_RATING:
-                    s.hasAvoid = true;
-                    break;
-                case ITEM_MOD_BLOCK_VALUE:
-                    s.hasBlockValue = true;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    static void UpdateItemStatProfileFromSpells(ItemTemplate const* proto, ItemStatProfile& s)
-    {
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-        {
-            auto const& spell = proto->Spells[i];
-            if (!spell.SpellId ||
-                (spell.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP && spell.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE))
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell.SpellId);
-            if (!spellInfo)
-                continue;
-
-            for (int eff = 0; eff < MAX_SPELL_EFFECTS; ++eff)
-            {
-                SpellEffectInfo const& effectInfo = spellInfo->Effects[eff];
-                if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
-                    continue;
-
-                if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_HEALING_DONE)
-                {
-                    s.hasSP = true;
-                    break;
-                }
-
-                if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_DAMAGE_DONE &&
-                    (effectInfo.MiscValue & SPELL_SCHOOL_MASK_MAGIC) == SPELL_SCHOOL_MASK_MAGIC)
-                {
-                    s.hasSP = true;
-                    break;
-                }
-
-                if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_RESISTANCE &&
-                    (effectInfo.MiscValue & SPELL_SCHOOL_MASK_NORMAL) == SPELL_SCHOOL_MASK_NORMAL)
-                {
-                    s.hasAvoid = true;
-                    break;
-                }
-
-                if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_RATING &&
-                    (effectInfo.MiscValue == CR_DODGE || effectInfo.MiscValue == CR_PARRY ||
-                     effectInfo.MiscValue == CR_BLOCK))
-                {
-                    s.hasAvoid = true;
-                    break;
-                }
-
-                if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_RATING &&
-                    (effectInfo.MiscValue == CR_HIT_SPELL || effectInfo.MiscValue == CR_CRIT_SPELL ||
-                     effectInfo.MiscValue == CR_HASTE_SPELL))
-                {
-                    s.hasHIT = s.hasHIT || (effectInfo.MiscValue == CR_HIT_SPELL);
-                    s.hasCRIT = s.hasCRIT || (effectInfo.MiscValue == CR_CRIT_SPELL);
-                    s.hasHASTE = s.hasHASTE || (effectInfo.MiscValue == CR_HASTE_SPELL);
-                    break;
-                }
-
-                if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER ||
-                    effectInfo.ApplyAuraName == SPELL_AURA_MOD_RANGED_ATTACK_POWER)
-                {
-                    s.hasAP = true;
-                    break;
-                }
-            }
-
-            // Preserve original behavior: stop scanning item spells as soon as SP is detected.
-            if (s.hasSP)
+            case ITEM_MOD_INTELLECT:
+                s.hasINT = true;
+                break;
+            case ITEM_MOD_SPIRIT:
+                s.hasSPI = true;
+                break;
+            case ITEM_MOD_SPELL_POWER:
+                s.hasSP = true;
+                break;
+            case ITEM_MOD_SPELL_HEALING_DONE:
+                s.hasSP = true;
+                break;
+            case ITEM_MOD_HIT_RATING:
+                s.hasHIT = true;
+                break;
+            case ITEM_MOD_CRIT_RATING:
+                s.hasCRIT = true;
+                break;
+            case ITEM_MOD_HASTE_RATING:
+                s.hasHASTE = true;
+                break;
+            case ITEM_MOD_MANA_REGENERATION:
+                s.hasMP5 = true;
+                break;
+            case ITEM_MOD_STRENGTH:
+                s.hasSTR = true;
+                break;
+            case ITEM_MOD_AGILITY:
+                s.hasAGI = true;
+                break;
+            case ITEM_MOD_ATTACK_POWER:
+                s.hasAP = true;
+                break;
+            case ITEM_MOD_ARMOR_PENETRATION_RATING:
+                s.hasARP = true;
+                break;
+            case ITEM_MOD_DEFENSE_SKILL_RATING:
+                s.hasDef = true;
+                break;
+            case ITEM_MOD_DODGE_RATING:
+            case ITEM_MOD_PARRY_RATING:
+            case ITEM_MOD_BLOCK_RATING:
+                s.hasAvoid = true;
+                break;
+            case ITEM_MOD_BLOCK_VALUE:
+                s.hasBlockValue = true;
+                break;
+            default:
                 break;
         }
     }
-} // namespace
+}
+
+static void UpdateItemStatProfileFromSpells(ItemTemplate const* proto, ItemStatProfile& s)
+{
+    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        auto const& spell = proto->Spells[i];
+        if (!spell.SpellId ||
+            (spell.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP && spell.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE))
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell.SpellId);
+        if (!spellInfo)
+            continue;
+
+        for (int eff = 0; eff < MAX_SPELL_EFFECTS; ++eff)
+        {
+            SpellEffectInfo const& effectInfo = spellInfo->Effects[eff];
+            if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
+                continue;
+
+            if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_HEALING_DONE)
+            {
+                s.hasSP = true;
+                break;
+            }
+
+            if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_DAMAGE_DONE &&
+                (effectInfo.MiscValue & SPELL_SCHOOL_MASK_MAGIC) == SPELL_SCHOOL_MASK_MAGIC)
+            {
+                s.hasSP = true;
+                break;
+            }
+
+            if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_RESISTANCE &&
+                (effectInfo.MiscValue & SPELL_SCHOOL_MASK_NORMAL) == SPELL_SCHOOL_MASK_NORMAL)
+            {
+                s.hasAvoid = true;
+                break;
+            }
+
+            if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_RATING &&
+                (effectInfo.MiscValue == CR_DODGE || effectInfo.MiscValue == CR_PARRY ||
+                 effectInfo.MiscValue == CR_BLOCK))
+            {
+                s.hasAvoid = true;
+                break;
+            }
+
+            if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_RATING &&
+                (effectInfo.MiscValue == CR_HIT_SPELL || effectInfo.MiscValue == CR_CRIT_SPELL ||
+                 effectInfo.MiscValue == CR_HASTE_SPELL))
+            {
+                s.hasHIT = s.hasHIT || (effectInfo.MiscValue == CR_HIT_SPELL);
+                s.hasCRIT = s.hasCRIT || (effectInfo.MiscValue == CR_CRIT_SPELL);
+                s.hasHASTE = s.hasHASTE || (effectInfo.MiscValue == CR_HASTE_SPELL);
+                break;
+            }
+
+            if (effectInfo.ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER ||
+                effectInfo.ApplyAuraName == SPELL_AURA_MOD_RANGED_ATTACK_POWER)
+            {
+                s.hasAP = true;
+                break;
+            }
+        }
+
+        // Preserve original behavior: stop scanning item spells as soon as SP is detected.
+        if (s.hasSP)
+            break;
+    }
+}
+}  // namespace
 
 ItemStatProfile BuildItemStatProfile(ItemTemplate const* proto)
 {
@@ -1038,7 +956,7 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
                 proto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF || proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER ||
                 proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE ||
                 proto->SubClass == ITEM_SUBCLASS_WEAPON_WAND;
-             return isCasterWeapon && (hasCaster || (hasCasterOffense && !hasPhysical));
+            return isCasterWeapon && (hasCaster || (hasCasterOffense && !hasPhysical));
         }
 
         return hasPhysical;
@@ -1161,8 +1079,8 @@ static ItemUsage AdjustUsageForCrossArmor(Player* bot, ItemTemplate const* proto
         if (oldProto->Quality <= ITEM_QUALITY_NORMAL)
             continue;
 
-        float oldScore = sRandomItemMgr->CalculateItemWeight(
-            bot, oldProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
+        float oldScore = sRandomItemMgr->CalculateItemWeight(bot, oldProto->ItemId,
+                                                             oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
 
         if (oldScore > bestOld)
             bestOld = oldScore;
@@ -1204,7 +1122,7 @@ static bool IsUniqueItemAlreadyEquipped(Player* bot, ItemTemplate const* proto, 
     // If total > bag-only, at least one copy is equipped.
     return totalItemCount > bagItemCount;
 }
-} // namespace
+}  // namespace
 
 ItemUsage LootUsageValue::Calculate()
 {
@@ -1302,9 +1220,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
 
         // Determine if the new weapon is a valid Titan Grip weapon
-        isValidTGWeapon = (itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
-                           itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
-                           itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2);
+        isValidTGWeapon =
+            (itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 || itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+             itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2);
 
         // If the bot can Titan Grip, ignore any 2H weapon that isn't a 2H sword, mace, or axe.
         if (bot->CanTitanGrip())
@@ -1322,9 +1240,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         // OR
         // - The bot can Titan Grip and it is a valid TG weapon
         // Then we can consider the offhand slot as well.
-        if (bot->CanDualWield() &&
-            ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) ||
-             (bot->CanTitanGrip() && isValidTGWeapon)))
+        if (bot->CanDualWield() && ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) ||
+                                    (bot->CanTitanGrip() && isValidTGWeapon)))
         {
             possibleSlots = 2;
         }
@@ -1345,12 +1262,12 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         }
 
         ItemTemplate const* oldItemProto = oldItem->GetTemplate();
-        if (oldItemProto && oldItemProto->Quality <= ITEM_QUALITY_POOR &&
-            itemProto->Quality >= ITEM_QUALITY_UNCOMMON &&
+        if (oldItemProto && oldItemProto->Quality <= ITEM_QUALITY_POOR && itemProto->Quality >= ITEM_QUALITY_UNCOMMON &&
             IsFallbackNeedReasonableForSpec(bot, itemProto))
             return ITEM_USAGE_EQUIP;
 
-        float oldScore = calculator.CalculateItem(oldItemProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
+        float oldScore =
+            calculator.CalculateItem(oldItemProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
 
         // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
         if (itemScore || oldScore)
@@ -1383,10 +1300,10 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         //     isBetter = true;
 
         Item* item = CurrentItem(itemProto);
-        bool itemIsBroken =
-            item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
-        bool oldItemIsBroken =
-            oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+        bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 &&
+                            item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
+        bool oldItemIsBroken = oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 &&
+                               oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
 
         if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquipInSlot || !existingShouldEquip) && isBetter)
         {
@@ -1395,8 +1312,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
                 case ITEM_CLASS_ARMOR:
                     if (oldItemProto->SubClass <= itemProto->SubClass)
                     {
-                        // Need to add some logic to check second slot before returning, but as it happens, all three of these
-                        // return vals will result in an attempted equip action so it wouldn't have much effect currently
+                        // Need to add some logic to check second slot before returning, but as it happens, all three of
+                        // these return vals will result in an attempted equip action so it wouldn't have much effect
+                        // currently
                         if (itemIsBroken && !oldItemIsBroken)
                             return ITEM_USAGE_BROKEN_EQUIP;
                         if (shouldEquipInSlot)
@@ -1464,7 +1382,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
                 if (player->GetItemCount(proto->ItemId, false) >= quest->RequiredItemCount[i])
                     continue;
 
-                return true; // Item is directly required for a quest
+                return true;  // Item is directly required for a quest
             }
         }
 
@@ -1493,7 +1411,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
                             if (player->GetItemCount(createdItemId, false) >= quest->RequiredItemCount[j])
                                 continue;
 
-                            return true; // Item is useful because it creates a required quest item
+                            return true;  // Item is useful because it creates a required quest item
                         }
                     }
                 }
@@ -1501,37 +1419,37 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
         }
     }
 
-    return false; // Item is not useful for any active quests
+    return false;  // Item is not useful for any active quests
 }
 
 namespace
 {
-    // Tools / profession items used by IsItemNeededForSkill().
-    constexpr uint32 ITEM_TUNNEL_PICK                = 756;
-    constexpr uint32 ITEM_KOBOLD_EXCAVATION_PICK     = 778;
-    constexpr uint32 ITEM_GOUGING_PICK               = 1819;
-    constexpr uint32 ITEM_MINERS_REVENGE             = 1893;
-    constexpr uint32 ITEM_COLD_IRON_PICK             = 1959;
-    constexpr uint32 ITEM_MINING_PICK                = 2901;
-    constexpr uint32 ITEM_DIGMASTER_5000             = 9465;
-    constexpr uint32 ITEM_BRANNS_TRUSTY_PICK          = 20723;
-    constexpr uint32 ITEM_GNOMISH_ARMY_KNIFE          = 40772;
-    constexpr uint32 ITEM_HAMMER_PICK                = 40892;
-    constexpr uint32 ITEM_BLADED_PICKAXE             = 40893;
-    constexpr uint32 ITEM_BLACKSMITH_HAMMER          = 5956;
-    constexpr uint32 ITEM_ARCLIGHT_SPANNER           = 6219;
-    constexpr uint32 ITEM_RUNED_COPPER_ROD           = 6218;
-    constexpr uint32 ITEM_RUNED_SILVER_ROD           = 6339;
-    constexpr uint32 ITEM_RUNED_GOLDEN_ROD           = 11130;
-    constexpr uint32 ITEM_RUNED_TRUESILVER_ROD       = 11145;
-    constexpr uint32 ITEM_RUNED_ARCANITE_ROD         = 16207;
-    constexpr uint32 ITEM_SKINNING_KNIFE             = 7005;
-    constexpr uint32 ITEM_SKINNING_KNIFE_ZULIAN      = 12709;
-    constexpr uint32 ITEM_SKINNING_KNIFE_ZULIAN_2    = 19901;
-    constexpr uint32 ITEM_FLINT_AND_TINDER           = 4471;
-    constexpr uint32 ITEM_SIMPLE_WOOD                = 4470;
-    constexpr uint32 ITEM_FISHING_ROD                = 6256;
-} // namespace
+// Tools / profession items used by IsItemNeededForSkill().
+constexpr uint32 ITEM_TUNNEL_PICK = 756;
+constexpr uint32 ITEM_KOBOLD_EXCAVATION_PICK = 778;
+constexpr uint32 ITEM_GOUGING_PICK = 1819;
+constexpr uint32 ITEM_MINERS_REVENGE = 1893;
+constexpr uint32 ITEM_COLD_IRON_PICK = 1959;
+constexpr uint32 ITEM_MINING_PICK = 2901;
+constexpr uint32 ITEM_DIGMASTER_5000 = 9465;
+constexpr uint32 ITEM_BRANNS_TRUSTY_PICK = 20723;
+constexpr uint32 ITEM_GNOMISH_ARMY_KNIFE = 40772;
+constexpr uint32 ITEM_HAMMER_PICK = 40892;
+constexpr uint32 ITEM_BLADED_PICKAXE = 40893;
+constexpr uint32 ITEM_BLACKSMITH_HAMMER = 5956;
+constexpr uint32 ITEM_ARCLIGHT_SPANNER = 6219;
+constexpr uint32 ITEM_RUNED_COPPER_ROD = 6218;
+constexpr uint32 ITEM_RUNED_SILVER_ROD = 6339;
+constexpr uint32 ITEM_RUNED_GOLDEN_ROD = 11130;
+constexpr uint32 ITEM_RUNED_TRUESILVER_ROD = 11145;
+constexpr uint32 ITEM_RUNED_ARCANITE_ROD = 16207;
+constexpr uint32 ITEM_SKINNING_KNIFE = 7005;
+constexpr uint32 ITEM_SKINNING_KNIFE_ZULIAN = 12709;
+constexpr uint32 ITEM_SKINNING_KNIFE_ZULIAN_2 = 19901;
+constexpr uint32 ITEM_FLINT_AND_TINDER = 4471;
+constexpr uint32 ITEM_SIMPLE_WOOD = 4470;
+constexpr uint32 ITEM_FISHING_ROD = 6256;
+}  // namespace
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)
 {
@@ -1960,8 +1878,8 @@ static bool IsGlyphMasteryBook(ItemTemplate const* proto)
 // Value object for collectible cosmetics (mounts/pets) used in loot rules.
 struct CollectibleInfo
 {
-    bool isCosmetic = false;   // true if this is a cosmetic collectible (mount/pet)
-    bool alreadyOwned = false; // true if the bot already knows/owns it in a meaningful way
+    bool isCosmetic = false;    // true if this is a cosmetic collectible (mount/pet)
+    bool alreadyOwned = false;  // true if the bot already knows/owns it in a meaningful way
 };
 
 static CollectibleInfo BuildCollectibleInfo(Player* bot, ItemTemplate const* proto)
@@ -1976,18 +1894,18 @@ static CollectibleInfo BuildCollectibleInfo(Player* bot, ItemTemplate const* pro
 
 #if defined(ITEM_SUBCLASS_MISC_MOUNT) || defined(ITEM_SUBCLASS_MISC_PET)
     bool const isMount =
-#  if defined(ITEM_SUBCLASS_MISC_MOUNT)
+#if defined(ITEM_SUBCLASS_MISC_MOUNT)
         proto->SubClass == ITEM_SUBCLASS_MISC_MOUNT
-#  else
+#else
         false
-#  endif
+#endif
         ;
     bool const isPet =
-#  if defined(ITEM_SUBCLASS_MISC_PET)
+#if defined(ITEM_SUBCLASS_MISC_PET)
         proto->SubClass == ITEM_SUBCLASS_MISC_PET
-#  else
+#else
         false
-#  endif
+#endif
         ;
     if (!isMount && !isPet)
         return info;
@@ -2161,14 +2079,7 @@ static int8 TokenSlotFromName(ItemTemplate const* proto)
 
 static std::array<uint32, 6> const& GetSanctificationTokenIds()
 {
-    static std::array<uint32, 6> const sanctificationTokenIds = {
-        52025,
-        52026,
-        52027,
-        52028,
-        52029,
-        52030
-    };
+    static std::array<uint32, 6> const sanctificationTokenIds = {52025, 52026, 52027, 52028, 52029, 52030};
 
     return sanctificationTokenIds;
 }
@@ -2254,8 +2165,7 @@ static TokenInfo BuildTokenInfo(ItemTemplate const* proto, Player* bot)
     if (!proto || !bot)
         return info;
 
-    info.isToken = (proto->Class == ITEM_CLASS_MISC &&
-                    proto->SubClass == ITEM_SUBCLASS_JUNK &&
+    info.isToken = (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK &&
                     proto->Quality == ITEM_QUALITY_EPIC) ||
                    IsSanctificationToken(proto);
     if (!info.isToken)
@@ -2317,11 +2227,8 @@ static RollVote ApplyDisenchantPreference(RollVote currentVote, ItemTemplate con
     // Mode 0 = no DE button; 1 = enchanters only; 2 = all bots can DE.
     bool const deAllowedForBot = (deMode == 2u) || (deMode == 1u && hasEnchantSkill);
 
-    if (currentVote != NEED &&
-        deAllowedForBot &&
-        group &&
-        (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) &&
-        isDeCandidate &&
+    if (currentVote != NEED && deAllowedForBot && group &&
+        (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) && isDeCandidate &&
         usage == ITEM_USAGE_DISENCHANT)
         return DISENCHANT;
 
@@ -2425,14 +2332,12 @@ static RollVote CalculateBaseRollVote(Player* bot, ItemTemplate const* proto, in
     constexpr uint32 BIND_WHEN_EQUIPPED = 2;  // BoE
     constexpr uint32 BIND_WHEN_USE = 3;       // BoU
 
-    if (vote == NEED && !recipeNeed && !isLockbox && !isCollectibleCosmetic &&
-        proto->Bonding == BIND_WHEN_EQUIPPED &&
+    if (vote == NEED && !recipeNeed && !isLockbox && !isCollectibleCosmetic && proto->Bonding == BIND_WHEN_EQUIPPED &&
         !sPlayerbotAIConfig->allowBoENeedIfUpgrade)
 
         vote = GREED;
 
-    if (vote == NEED && !recipeNeed && !isLockbox && !isCollectibleCosmetic &&
-        proto->Bonding == BIND_WHEN_USE &&
+    if (vote == NEED && !recipeNeed && !isLockbox && !isCollectibleCosmetic && proto->Bonding == BIND_WHEN_USE &&
         !sPlayerbotAIConfig->allowBoUNeedIfUpgrade)
 
         vote = GREED;
@@ -2484,7 +2389,7 @@ static bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
 
     return false;  // Item is not equipped or in bags, roll for it
 }
-} // namespace
+}  // namespace
 
 char const* RollVoteText(RollVote v)
 {
