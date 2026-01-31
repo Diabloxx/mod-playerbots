@@ -229,7 +229,7 @@ ItemUsage ItemUsageValue::Calculate()
     bool isSelfBot = (master == bot);
     bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
     bool masterNeedsItemForQuest =
-        master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
+        master && sPlayerbotAIConfig.syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
 
     // Identify the source of loot
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
@@ -348,7 +348,7 @@ std::string ItemUsageValue::BuildItemUsageParam(uint32 itemId, int32 randomPrope
 
 namespace
 {
-static bool EnableGroupUsageChecks() { return sPlayerbotAIConfig->rollUseGroupUsageChecks; }
+static bool EnableGroupUsageChecks() { return sPlayerbotAIConfig.rollUseGroupUsageChecks; }
 
 static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto);
 
