@@ -16,6 +16,8 @@ namespace
     constexpr uint32 NPC_FIERY_COMBUSTION_MARK    = 40001;
     constexpr uint32 NPC_LIVING_INFERNO           = 40681;
     constexpr uint32 NPC_LIVING_EMBER             = 40683;
+
+    constexpr float HALION_EDGE_DISTANCE          = 28.0f;
 }
 
 bool RubySanctumBaltharusBrandAction::Execute(Event /*event*/)
@@ -63,18 +65,34 @@ bool RubySanctumBaltharusSplitAddAction::Execute(Event /*event*/)
     if (!add)
         return false;
 
-    // Keep tanks close to the pull spot; only nudge away from the main boss to avoid stacking
     if (botAI->IsTank(bot))
     {
+        if (boss && (botAI->IsMainTank(bot) || boss->GetVictim() == bot))
+            return Attack(boss);
+
+        if (botAI->DoSpecificAction("taunt", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("growl", Event("rubysanctum"), true))
+            return true;
+
         if (boss)
         {
             float dist = bot->GetDistance(boss);
-            if (dist < 8.0f)
-                MoveAway(boss, 8.0f);
+            if (dist < 10.0f)
+                MoveAway(boss, 10.0f);
         }
         else
-            MoveFromGroup(8.0f);
+            MoveFromGroup(10.0f);
+
+        return Attack(add);
     }
+
+    if (botAI->IsHeal(bot))
+        return false;
+
+    if (boss && botAI->IsRanged(bot))
+        return Attack(boss);
+
     return Attack(add);
 }
 
@@ -129,6 +147,40 @@ bool RubySanctumZarithrianAddsAction::Execute(Event /*event*/)
     if (!target)
         return false;
 
+    if (bot->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
+    {
+        if (botAI->DoSpecificAction("tremor totem", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("fear ward", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("berserker rage", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("will of the forsaken", Event("rubysanctum"), true))
+            return true;
+    }
+
+    if (target->HasUnitState(UNIT_STATE_CASTING))
+    {
+        if (botAI->DoSpecificAction("kick", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("pummel", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("mind freeze", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("shield bash", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("earth shock", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("wind shear", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("counterspell", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("spell lock", Event("rubysanctum"), true))
+            return true;
+        if (botAI->DoSpecificAction("rebuke", Event("rubysanctum"), true))
+            return true;
+    }
+
     // If fear just ended, clear lingering controlled movement to resume combat
     if (!bot->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED) &&
         bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE)
@@ -156,7 +208,14 @@ bool RubySanctumZarithrianAddsAction::Execute(Event /*event*/)
 
 bool RubySanctumHalionCombustionAction::Execute(Event /*event*/)
 {
-    // Move out before dispel; prefer moving off the ground mark if we can see it
+    Unit* boss = AI_VALUE2(Unit*, "find target", "halion");
+    if (boss)
+    {
+        float dist = bot->GetExactDist2d(boss);
+        if (dist < HALION_EDGE_DISTANCE)
+            return MoveAway(boss, HALION_EDGE_DISTANCE);
+    }
+
     Unit* mark = nullptr;
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
     for (ObjectGuid const& guid : npcs)
@@ -169,44 +228,20 @@ bool RubySanctumHalionCombustionAction::Execute(Event /*event*/)
         }
     }
 
-    // Small sidestep to drop combustion without kiting around the arena
-    bool moved = mark ? MoveAway(mark, 10.0f) : MoveAway(bot, 10.0f);
-
-    // Return to a safe position: tanks front, others on flank to avoid breath/tail
-    if (Unit* boss = AI_VALUE2(Unit*, "find target", "halion"))
-    {
-        float dist = bot->GetExactDist2d(boss);
-        if (dist > 35.0f)
-        {
-            if (botAI->IsTank(bot))
-                Follow(boss, 6.0f, 0.0f);
-            else
-                Follow(boss, 8.0f, ANGLE_90_DEG);
-        }
-    }
-
-    return moved;
+    return mark ? MoveAway(mark, 10.0f) : MoveAway(bot, 10.0f);
 }
 
 bool RubySanctumHalionConsumptionAction::Execute(Event /*event*/)
 {
-    // Mirror combustion movement: short step keeps bots in range
-    bool moved = MoveAway(bot, 10.0f);
-
-    // Return to a safe position: tanks front, others on flank to avoid breath/tail
-    if (Unit* boss = AI_VALUE2(Unit*, "find target", "halion"))
+    Unit* boss = AI_VALUE2(Unit*, "find target", "halion");
+    if (boss)
     {
         float dist = bot->GetExactDist2d(boss);
-        if (dist > 35.0f)
-        {
-            if (botAI->IsTank(bot))
-                Follow(boss, 6.0f, 0.0f);
-            else
-                Follow(boss, 8.0f, ANGLE_90_DEG);
-        }
+        if (dist < HALION_EDGE_DISTANCE)
+            return MoveAway(boss, HALION_EDGE_DISTANCE);
     }
 
-    return moved;
+    return MoveAway(bot, 10.0f);
 }
 
 bool RubySanctumHalionMeteorStrikeAction::Execute(Event /*event*/)
@@ -260,12 +295,49 @@ bool RubySanctumHalionInfernosAction::Execute(Event /*event*/)
 
 bool RubySanctumHalionTwilightCutterAction::Execute(Event /*event*/)
 {
-    // Simple avoidance: reposition away from current location
+    Unit* boss = AI_VALUE2(Unit*, "find target", "halion");
+    if (boss)
+    {
+        float dist = bot->GetExactDist2d(boss);
+        if (dist < 8.0f)
+            return MoveAway(boss, 8.0f);
+        if (dist > 30.0f)
+            return Follow(boss, botAI->IsTank(bot) ? 8.0f : 12.0f, ANGLE_90_DEG);
+
+        float angle = bot->GetAngle(boss) + ANGLE_90_DEG;
+        return Move(angle, botAI->IsTank(bot) ? 4.0f : 6.0f);
+    }
+
     return MoveAway(bot, 10.0f);
 }
 
 bool RubySanctumHalionCorporealityBalanceAction::Execute(Event /*event*/)
 {
-    // No direct control; acknowledge action
+    Unit* boss = AI_VALUE2(Unit*, "find target", "halion");
+    if (!boss || !boss->HealthBelowPct(50))
+        return false;
+
+    if (!botAI->ContainsStrategy(STRATEGY_TYPE_DPS))
+        return true;
+
+    static uint32 const corpAuras[] = { 74836,74835,74834,74833,74832,74826,74827,74828,74829,74830,74831 };
+    int corpIndex = -1;
+    for (int i = 0; i < static_cast<int>(sizeof(corpAuras) / sizeof(corpAuras[0])); ++i)
+    {
+        if (bot->HasAura(corpAuras[i]))
+        {
+            corpIndex = i;
+            break;
+        }
+    }
+
+    if (corpIndex == -1)
+        return true;
+
+    if (corpIndex <= 4)
+        botAI->ChangeStrategy("-dps", BOT_STATE_COMBAT);
+    else if (corpIndex >= 7)
+        botAI->ChangeStrategy("+dps", BOT_STATE_COMBAT);
+
     return true;
 }

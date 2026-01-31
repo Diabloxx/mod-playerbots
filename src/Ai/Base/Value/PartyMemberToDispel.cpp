@@ -7,6 +7,16 @@
 
 #include "Playerbots.h"
 
+namespace
+{
+    constexpr uint32 SPELL_FIERY_COMBUSTION = 74562;
+    constexpr uint32 SPELL_MARK_OF_COMBUSTION = 74567;
+    constexpr uint32 SPELL_SOUL_CONSUMPTION = 74792;
+    constexpr uint32 SPELL_MARK_OF_CONSUMPTION = 74795;
+    constexpr uint32 MAP_RUBY_SANCTUM = 724;
+    constexpr float HALION_DISPEL_EDGE_DISTANCE = 28.0f;
+}
+
 class PartyMemberToDispelPredicate : public FindPlayerPredicate, public PlayerbotAIAware
 {
 public:
@@ -15,7 +25,24 @@ public:
     {
     }
 
-    bool Check(Unit* unit) override { return unit->IsAlive() && botAI->HasAuraToDispel(unit, dispelType); }
+    bool Check(Unit* unit) override
+    {
+        if (!unit || !unit->IsAlive() || !botAI->HasAuraToDispel(unit, dispelType))
+            return false;
+
+        if (unit->GetMapId() != MAP_RUBY_SANCTUM)
+            return true;
+
+        if (unit->HasAura(SPELL_FIERY_COMBUSTION) || unit->HasAura(SPELL_MARK_OF_COMBUSTION) ||
+            unit->HasAura(SPELL_SOUL_CONSUMPTION) || unit->HasAura(SPELL_MARK_OF_CONSUMPTION))
+        {
+            Unit* halion = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "halion")->Get();
+            if (halion && unit->GetExactDist2d(halion) < HALION_DISPEL_EDGE_DISTANCE)
+                return false;
+        }
+
+        return true;
+    }
 
 private:
     uint32 dispelType;
