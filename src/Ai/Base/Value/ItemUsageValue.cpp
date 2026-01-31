@@ -196,7 +196,7 @@ ItemUsage ItemUsageValue::Calculate()
         }
     }
 
-    if (bot->GetGuildId() && sGuildTaskMgr->IsGuildTaskItem(itemId, bot->GetGuildId()))
+    if (bot->GetGuildId() && GuildTaskMgr::instance().IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
     // First, check if the item is interesting as equipment (upgrade, bad-equip, etc.)
@@ -1179,7 +1179,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
     }
 
     bool shouldEquip = false;
-    // uint32 statWeight = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
+    // uint32 statWeight = sRandomItemMgr.GetLiveStatWeight(bot, itemProto->ItemId);
     StatsWeightCalculator calculator(bot);
     calculator.SetItemSetBonus(false);
     calculator.SetOverflowPenalty(false);
@@ -1287,8 +1287,8 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         if (!sRandomItemMgr->CanEquipForBot(bot, oldItemProto))
             existingShouldEquip = false;
 
-        // uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
-        // uint32 newItemPower = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
+        // uint32 oldItemPower = sRandomItemMgr.GetLiveStatWeight(bot, oldItemProto->ItemId);
+        // uint32 newItemPower = sRandomItemMgr.GetLiveStatWeight(bot, itemProto->ItemId);
 
         // Compare items based on item level, quality or itemId.
         const bool isBetter = itemScore > oldScore;
